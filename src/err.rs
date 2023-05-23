@@ -5,6 +5,8 @@ pub struct AppletError
     pub message: Option<String>
 }
 
+pub type AppletResult = Result<(), AppletError>;
+
 impl AppletError
 {
     pub fn new(status_code: i32, message: String) -> AppletError

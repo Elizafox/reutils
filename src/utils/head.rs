@@ -1,26 +1,41 @@
-/* utils/cat.rs - implementation of cat
+/* utils/head.rs - implementation of head
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use std::io::{stdin, stdout, BufReader, BufRead, copy, prelude::*};
+use std::io::{stdin, BufReader, BufRead};
 use std::fs::File;
+use std::str::FromStr;
 
 use getargs::{Opt, Options};
 
 use crate::err::{AppletError, AppletResult};
 
-pub fn util_cat(args: Vec<String>) -> AppletResult
+fn usage(args: &Vec<String>)
 {
+    eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
+}
+
+pub fn util_head(args: Vec<String>) -> AppletResult
+{
+    let mut total = 10u64;  // POSIX default
+
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error")
     {
         match opt
         {
-            Opt::Short('u') => { /* No-op */ },
+            Opt::Short('n') =>
+            {
+                match u64::from_str(opts.value().unwrap())
+                {
+                    Ok(result) => { total = result },
+                    Err(e) => { return Err(AppletError::new(1, format!("Invalid total: {}", e))); }
+                }
+            },
             Opt::Short('h') | Opt::Long("help") =>
             {
-                eprintln!("Usage: {} [-u] [-h|--help] [FILE] ...", args[0]);
+                usage(&args);
                 return Ok(());
             },
             _ => {}
@@ -51,17 +66,30 @@ pub fn util_cat(args: Vec<String>) -> AppletResult
         files.push(("stdin", Box::new(BufReader::new(stdin()))));
     }
 
-    for (filename, mut file) in files
+    for (filename, file) in files
     {
-        if let Err(e) = copy(&mut file, &mut stdout())
-        {
-            return Err(AppletError::new(1, format!("Could not write to {}: {}", filename, e)));
-        }
-    }
+        let mut count = 0u64;
 
-    if let Err(e) = stdout().flush()
-    {
-        return Err(AppletError::new(1, format!("Could not write to stdout: {}", e)));
+        for line in file.lines()
+        {
+            count += 1;
+            if count > total
+            {
+                break;
+            }
+
+            match line
+            {
+                Ok(line) =>
+                {
+                    println!("{}", line);
+                },
+                Err(e) =>
+                {
+                    return Err(AppletError::new(1, format!("Error reading from {}: {}", filename, e)));
+                }
+            }
+        }
     }
 
     Ok(())

@@ -6,9 +6,9 @@
 use std::process::Command;
 
 use crate::utils::DISPATCH_TABLE;
-use crate::err::AppletError;
+use crate::err::{AppletError, AppletResult};
 
-pub fn util_reutils(args: Vec<String>) -> Result<(), AppletError>
+pub fn util_reutils(args: Vec<String>) -> AppletResult
 {
     if args.len() <= 1
     {
