@@ -1,6 +1,6 @@
 /* main.rs - entrypoint for reutils
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 mod utils;

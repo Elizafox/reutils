@@ -1,6 +1,6 @@
 /* utils/cat.rs - implementation of cat
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 use std::io::{stdin, stdout, BufReader, BufRead, copy, prelude::*};
