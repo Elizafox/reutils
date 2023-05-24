@@ -75,7 +75,7 @@ where
     for line in rev_lines {
         buf.push_front(line);
         if (buf.len() as u64) > total {
-            buf.pop_back();
+            buf.pop_front();
         }
     }
 
