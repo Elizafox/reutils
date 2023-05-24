@@ -96,7 +96,14 @@ dependencies = [
  "getargs",
  "libc",
  "phf",
+ "rev_lines",
 ]
+
+[[package]]
+name = "rev_lines"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af8297f87280eeeed2dea96a8eff55ddbb909a7cccc42be6087d29954068304d"
 
 [[package]]
 name = "siphasher"

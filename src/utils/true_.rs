@@ -5,7 +5,6 @@
 
 use crate::err::AppletResult;
 
-pub fn util_true(_args: Vec<String>) -> AppletResult
-{
+pub fn util_true(_args: Vec<String>) -> AppletResult {
     Ok(())
 }

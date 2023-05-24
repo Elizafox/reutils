@@ -20,3 +20,4 @@ codegen-units = 1
 libc = { version = "0.2" }
 phf = { version = "0.11.1", features = ["macros"] }
 getargs = "0.5.0"
+rev_lines = "0.2.2"
