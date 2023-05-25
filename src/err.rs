@@ -1,23 +1,27 @@
 #[derive(Debug)]
-pub struct AppletError {
-    pub status_code: i32,
+pub struct Error {
+    pub code: i32,
     pub message: Option<String>,
 }
 
-pub type AppletResult = Result<(), AppletError>;
+pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 
-impl AppletError {
-    pub fn new(status_code: i32, message: String) -> AppletError {
-        AppletError {
-            status_code: status_code,
+impl Error {
+    pub fn new(code: i32, message: String) -> Self {
+        Self {
+            code,
             message: Some(message),
         }
     }
 
-    pub fn new_nomsg(status_code: i32) -> AppletError {
-        AppletError {
-            status_code: status_code,
+    pub fn new_nomsg(code: i32) -> Self {
+        Self {
+            code,
             message: None,
         }
     }
 }
+
+// 2023-05-24 AMR TODO: strip these out
+pub type AppletResult = Result;
+pub type AppletError = Error;

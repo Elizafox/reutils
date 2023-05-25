@@ -20,9 +20,9 @@ pub type DispatchFn = fn(Vec<String>) -> AppletResult;
 
 type MapValue = (&'static str, DispatchFn);
 
-/* Utilities must be registered in this structure.
- * Otherwise, reutils won't know about them!
- */
+/** Utilities must be registered in this structure.
+    Otherwise, reutils won't know about them!
+*/
 pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! {
     "cat" => ("/bin/cat", util_cat),
     "false" => ("/bin/false", util_false),

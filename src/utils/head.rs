@@ -52,7 +52,7 @@ pub fn util_head(args: Vec<String>) -> AppletResult {
         }
     }
 
-    if files.len() == 0 {
+    if files.is_empty() {
         // If ain't nobody got me, stdin got me.
         files.push(("stdin", Box::new(BufReader::new(stdin()))));
     }

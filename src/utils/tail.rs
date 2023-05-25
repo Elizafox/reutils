@@ -1,108 +1,70 @@
 use std::collections::VecDeque;
 use std::fs::File;
-use std::io::{stdin, BufRead, BufReader, Read, Seek, Stdin};
+use std::io::{self, BufRead, BufReader};
+use std::iter;
 use std::str::FromStr;
 
 use getargs::{Opt, Options};
-use rev_lines::RevLines;
 
-use crate::err::{AppletError, AppletResult};
+use crate::err::{Error, Result};
+use crate::bufinput::BufInput;
 
 fn usage(args: &[String]) {
     eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
 }
 
-trait Tailable {
-    fn tail(self, total: u64) -> AppletResult;
-}
+fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
+    if name == "-" {
+        return Ok((
+            BufInput::Standard(io::stdin().lock()),
+            total,
+        ));
+    }
+    else {
+        let f = File::open(name)
+            .map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
 
-impl Tailable for (String, BufReader<File>) {
-    fn tail(self, total: u64) -> AppletResult {
-        if self
-            .1
-            .get_ref()
-            .metadata()
-            .map_err(|e| {
-                AppletError::new(
-                    1,
-                    format!("Failed to get metadata for file: {}: {}", self.0, e),
-                )
-            })?
-            .is_file()
-        {
-            tail_rev(self.1, total)
-        } else {
-            tail_seq(self.1, total)
-        }
+        let f = BufInput::File(BufReader::new(f));
+
+        return Ok((f, total));
     }
 }
 
-impl Tailable for BufReader<Stdin> {
-    fn tail(self, total: u64) -> AppletResult {
-        tail_seq(self, total)
-    }
-}
+fn add_line(buff: &mut VecDeque<String>, line: Result<String, io::Error>, total: usize) -> Result {
+    let line = line.map_err(|e| Error::new(1, format!("Failed to fetch line: {e}")))?;
 
-// This implementation is used for stdin and FIFOs
-fn tail_seq<R>(file: BufReader<R>, total: u64) -> AppletResult
-where
-    R: Read,
-{
-    let mut buf = VecDeque::<String>::new();
-
-    for line in file.lines() {
-        buf.push_back(line.unwrap());
-        if (buf.len() as u64) > total {
-            buf.pop_front();
-        }
-    }
-
-    for line in buf {
-        println!("{}", line);
+    buff.push_back(line);
+    if buff.len() > total {
+        buff.pop_front();
     }
 
     Ok(())
 }
 
-// This implementation is used for regular files
-fn tail_rev<R>(file: BufReader<R>, total: u64) -> AppletResult
-where
-    R: Read + Seek,
+fn output((file, total): (BufInput, usize)) -> Result
 {
-    let mut buf = VecDeque::<String>::new();
-    let rev_lines = RevLines::new(file).unwrap();
+    let mut buff = VecDeque::with_capacity(total);
 
-    for line in rev_lines {
-        buf.push_front(line);
-        if (buf.len() as u64) == total {
-            break;
-        }
-    }
+    file.lines()
+        .map(|l| add_line(&mut buff, l, total))
+        .collect::<Result<Vec<_>, Error>>()
+        .map(|_| ())?;
 
-    for line in buf {
-        println!("{}", line);
-    }
+    buff.into_iter().for_each(|l| println!("{l}"));
 
     Ok(())
 }
 
-fn build_tuple(fname: String) -> Result<(String, BufReader<File>), AppletError> {
-    let file = File::open(&fname)
-        .map_err(|e| AppletError::new(1, format!("Could not open file: {}: {}", fname, e)))?;
-
-    Ok((fname, BufReader::new(file)))
-}
-
-pub fn util_tail(args: Vec<String>) -> AppletResult {
-    let mut total = 10u64; // POSIX default
-
+pub fn util_tail(args: Vec<String>) -> Result {
+    let mut total = 10usize; // POSIX default
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
+
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
-            Opt::Short('n') => match u64::from_str(opts.value().unwrap()) {
+            Opt::Short('n') => match usize::from_str(opts.value().unwrap()) {
                 Ok(result) => total = result,
                 Err(e) => {
-                    return Err(AppletError::new(1, format!("Invalid total: {}", e)));
+                    return Err(Error::new(1, format!("Invalid total: {}", e)));
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
@@ -115,17 +77,17 @@ pub fn util_tail(args: Vec<String>) -> AppletResult {
 
     let files = opts
         .positionals()
-        .map(str::to_string)
-        .map(build_tuple)
-        .collect::<Result<Vec<_>, AppletError>>()?;
+        .zip(iter::repeat(total))
+        .map(open)
+        .collect::<Result<Vec<_>>>()?;
 
     if files.is_empty() {
-        BufReader::new(stdin()).tail(total)
+        output((BufInput::Standard(io::stdin().lock()), total))
     } else {
         files
             .into_iter()
-            .map(|t| t.tail(total))
-            .collect::<Result<Vec<_>, AppletError>>()
+            .map(output)
+            .collect::<Result<Vec<_>>>()
             .map(|_| ())
     }
 }

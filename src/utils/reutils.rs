@@ -18,9 +18,8 @@ pub fn util_reutils(args: Vec<String>) -> AppletResult {
 
     // Determine if what we're executing is a builtin
     // If it is, run it and leave.
-    let util_entry = DISPATCH_TABLE.get(&args[1]).cloned();
-    if util_entry.is_some() {
-        return util_entry.unwrap().1(args.into_iter().skip(1).collect());
+    if let Some(util_entry) = DISPATCH_TABLE.get(&args[1]).cloned() {
+        return util_entry.1(args.into_iter().skip(1).collect());
     }
 
     let status = Command::new(&args[1]).args(args.iter().skip(1)).status();
@@ -35,7 +34,7 @@ pub fn util_reutils(args: Vec<String>) -> AppletResult {
             }
             None => Err(AppletError::new(
                 255,
-                format!("Process terminated by signal"),
+                "Process terminated by signal".to_string(),
             )),
         },
         Err(e) => Err(AppletError::new(
