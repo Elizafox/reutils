@@ -4,18 +4,19 @@
  */
 
 use std::fs::File;
-use std::io::{stdin, BufRead, BufReader};
+use std::io::{self, BufRead};
 use std::str::FromStr;
 
 use getargs::{Opt, Options};
 
-use crate::err::{AppletError, AppletResult};
+use crate::bufinput::BufInput;
+use crate::err::{Error, Result};
 
 fn usage(args: &[String]) {
     eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
 }
 
-pub fn util_head(args: Vec<String>) -> AppletResult {
+pub fn util_head(args: Vec<String>) -> Result {
     let mut total = 10u64; // POSIX default
 
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
@@ -24,7 +25,7 @@ pub fn util_head(args: Vec<String>) -> AppletResult {
             Opt::Short('n') => match u64::from_str(opts.value().unwrap()) {
                 Ok(result) => total = result,
                 Err(e) => {
-                    return Err(AppletError::new(1, format!("Invalid total: {}", e)));
+                    return Err(Error::new(1, format!("Invalid total: {}", e)));
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
@@ -35,26 +36,30 @@ pub fn util_head(args: Vec<String>) -> AppletResult {
         }
     }
 
-    let mut files: Vec<(&str, Box<dyn BufRead>)> = Vec::new();
+    let mut files: Vec<(&str, BufInput)> = Vec::new();
 
     for filename in opts.positionals() {
-        let file = File::open(filename);
-        match file {
-            Ok(file) => {
-                files.push((filename, Box::new(BufReader::new(file))));
-            }
-            Err(e) => {
-                return Err(AppletError::new(
-                    1,
-                    format!("Could not open file: {}: {}", filename, e),
-                ));
+        if filename == "-" {
+            files.push(("stdin", BufInput::Standard(io::stdin().lock())));
+        } else {
+            let file = File::open(filename);
+            match file {
+                Ok(file) => {
+                    files.push((filename, BufInput::File(io::BufReader::new(file))));
+                }
+                Err(e) => {
+                    return Err(Error::new(
+                        1,
+                        format!("Could not open file: {}: {}", filename, e),
+                    ));
+                }
             }
         }
     }
 
     if files.is_empty() {
         // If ain't nobody got me, stdin got me.
-        files.push(("stdin", Box::new(BufReader::new(stdin()))));
+        files.push(("stdin", BufInput::Standard(io::stdin().lock())));
     }
 
     for (filename, file) in files {
@@ -71,7 +76,7 @@ pub fn util_head(args: Vec<String>) -> AppletResult {
                     println!("{}", line);
                 }
                 Err(e) => {
-                    return Err(AppletError::new(
+                    return Err(Error::new(
                         1,
                         format!("Error reading from {}: {}", filename, e),
                     ));
