@@ -27,19 +27,10 @@ pub fn util_reutils(args: Vec<String>) -> Result {
         Ok(status) => match status.code() {
             Some(code) => {
                 eprintln!("Exited with status code {code}");
-                Err(Error::new(
-                    code,
-                    format!("Exited with status code {code}"),
-                ))
+                Err(Error::new(code, format!("Exited with status code {code}")))
             }
-            None => Err(Error::new(
-                255,
-                "Process terminated by signal".to_string(),
-            )),
+            None => Err(Error::new(255, "Process terminated by signal".to_string())),
         },
-        Err(e) => Err(Error::new(
-            255,
-            format!("Could not execute command: {}", e),
-        )),
+        Err(e) => Err(Error::new(255, format!("Could not execute command: {}", e))),
     }
 }

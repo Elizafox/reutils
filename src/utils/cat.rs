@@ -60,10 +60,7 @@ pub fn util_cat(args: Vec<String>) -> Result {
     }
 
     if let Err(e) = io::stdout().flush() {
-        return Err(Error::new(
-            1,
-            format!("Could not write to stdout: {}", e),
-        ));
+        return Err(Error::new(1, format!("Could not write to stdout: {}", e)));
     }
 
     Ok(())
