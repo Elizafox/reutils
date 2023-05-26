@@ -1,3 +1,6 @@
+/* TODO: a more efficient implementation reading backwards from the file is in order.
+ * But this is fine to get something out the door for now.
+ */
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
