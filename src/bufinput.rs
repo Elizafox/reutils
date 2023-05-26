@@ -10,7 +10,7 @@ impl io::Read for BufInput<'_> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         match self {
             BufInput::Standard(ref mut s) => s.read(buf),
-            BufInput::File(ref mut f)     => f.read(buf),
+            BufInput::File(ref mut f) => f.read(buf),
         }
     }
 }
@@ -19,14 +19,14 @@ impl io::BufRead for BufInput<'_> {
     fn fill_buf(&mut self) -> io::Result<&[u8]> {
         match self {
             BufInput::Standard(ref mut s) => s.fill_buf(),
-            BufInput::File(ref mut f)     => f.fill_buf(),
+            BufInput::File(ref mut f) => f.fill_buf(),
         }
     }
 
     fn consume(&mut self, amt: usize) {
         match self {
             BufInput::Standard(ref mut s) => s.consume(amt),
-            BufInput::File(ref mut f)     => f.consume(amt),
+            BufInput::File(ref mut f) => f.consume(amt),
         }
     }
 }

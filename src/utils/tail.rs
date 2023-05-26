@@ -9,8 +9,8 @@ use std::str::FromStr;
 
 use getargs::{Opt, Options};
 
-use crate::err::{Error, Result};
 use crate::bufinput::BufInput;
+use crate::err::{Error, Result};
 
 fn usage(args: &[String]) {
     eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
@@ -18,12 +18,8 @@ fn usage(args: &[String]) {
 
 fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
     if name == "-" {
-        return Ok((
-            BufInput::Standard(io::stdin().lock()),
-            total,
-        ));
-    }
-    else {
+        return Ok((BufInput::Standard(io::stdin().lock()), total));
+    } else {
         let f = File::open(name)
             .map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
 
@@ -44,8 +40,7 @@ fn add_line(buff: &mut VecDeque<String>, line: Result<String, io::Error>, total:
     Ok(())
 }
 
-fn output((file, total): (BufInput, usize)) -> Result
-{
+fn output((file, total): (BufInput, usize)) -> Result {
     let mut buff = VecDeque::with_capacity(total);
 
     file.lines()
