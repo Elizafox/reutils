@@ -1,5 +1,5 @@
 /* utils/tail.rs - implementation of tail
- * Copyright (C) 2023 Elizabeth Myers, Malina Thompson. All rights reserved.
+ * Copyright (C) 2023 Elizabeth Myers, Malina Thomas. All rights reserved.
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
