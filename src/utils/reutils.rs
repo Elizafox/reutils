@@ -5,15 +5,15 @@
 
 use std::process::Command;
 
-use crate::err::{AppletError, AppletResult};
+use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
 
-pub fn util_reutils(args: Vec<String>) -> AppletResult {
+pub fn util_reutils(args: Vec<String>) -> Result {
     if args.len() <= 1 {
         // FIXME FIXME FIXME!!!
         eprintln!("reutils v0.0.0");
         eprintln!("This program is free software.");
-        return Err(AppletError::new_nomsg(1));
+        return Err(Error::new_nomsg(1));
     }
 
     // Determine if what we're executing is a builtin
@@ -27,17 +27,17 @@ pub fn util_reutils(args: Vec<String>) -> AppletResult {
         Ok(status) => match status.code() {
             Some(code) => {
                 eprintln!("Exited with status code {code}");
-                Err(AppletError::new(
+                Err(Error::new(
                     code,
                     format!("Exited with status code {code}"),
                 ))
             }
-            None => Err(AppletError::new(
+            None => Err(Error::new(
                 255,
                 "Process terminated by signal".to_string(),
             )),
         },
-        Err(e) => Err(AppletError::new(
+        Err(e) => Err(Error::new(
             255,
             format!("Could not execute command: {}", e),
         )),

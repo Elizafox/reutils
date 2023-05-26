@@ -21,7 +21,3 @@ impl Error {
         }
     }
 }
-
-// 2023-05-24 AMR TODO: strip these out
-pub type AppletResult = Result;
-pub type AppletError = Error;

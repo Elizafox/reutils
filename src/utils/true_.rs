@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use crate::err::AppletResult;
+use crate::err::Result;
 
-pub fn util_true(_args: Vec<String>) -> AppletResult {
+pub fn util_true(_args: Vec<String>) -> Result {
     Ok(())
 }

@@ -5,7 +5,7 @@ mod reutils;
 mod tail;
 mod true_;
 
-use crate::err::AppletResult;
+use crate::err::Result;
 
 use crate::utils::cat::util_cat;
 use crate::utils::false_::util_false;
@@ -16,7 +16,7 @@ use crate::utils::true_::util_true;
 
 use phf::{phf_ordered_map, OrderedMap};
 
-pub type DispatchFn = fn(Vec<String>) -> AppletResult;
+pub type DispatchFn = fn(Vec<String>) -> Result;
 
 type MapValue = (&'static str, DispatchFn);
 

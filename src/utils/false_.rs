@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use crate::err::{AppletError, AppletResult};
+use crate::err::{Error, Result};
 
-pub fn util_false(_args: Vec<String>) -> AppletResult {
-    Err(AppletError::new_nomsg(1))
+pub fn util_false(_args: Vec<String>) -> Result {
+    Err(Error::new_nomsg(1))
 }
