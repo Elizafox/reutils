@@ -5,9 +5,8 @@ edition = "2021"
 
 [profile.dev]
 debug = true
-opt-level = "z"
+opt-level = 2
 lto = true
-codegen-units = 1
 
 [profile.release]
 panic = "abort"

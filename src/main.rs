@@ -27,7 +27,6 @@ fn main() {
         match util_entry.1(args) {
             Ok(_) => exit(0),
             Err(e) => {
-                eprintln!("failed {e:?}");
                 if let Some(message) = e.message {
                     eprintln!("{}", message);
                 }
