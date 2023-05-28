@@ -16,6 +16,9 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 
+[build_dependencies]
+crate-git-revision = "0.0.6"
+
 [dependencies]
 getargs = "0.5.0"
 libc = { version = "0.2" }

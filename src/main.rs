@@ -6,6 +6,7 @@
 mod bufinput;
 mod err;
 mod utils;
+mod version;
 
 use std::env;
 use std::path::Path;
