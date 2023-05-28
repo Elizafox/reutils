@@ -22,7 +22,8 @@ fn get_util_name(arg0: &str) -> String {
                 .file_stem()
                 .expect("Failed to get path name!")
                 .to_str()
-                .expect("Failed to get path name!"));
+                .expect("Failed to get path name!"),
+        );
     } else {
         // Use the usual implementation
         return String::from(
@@ -30,7 +31,8 @@ fn get_util_name(arg0: &str) -> String {
                 .file_name()
                 .expect("Failed to get path name!")
                 .to_str()
-                .expect("Failed to get path name!"));
+                .expect("Failed to get path name!"),
+        );
     }
 }
 

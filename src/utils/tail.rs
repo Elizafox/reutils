@@ -10,15 +10,73 @@ use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::iter;
+use std::path::Path;
 use std::str::FromStr;
+use std::time::Duration;
 
 use getargs::{Opt, Options};
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
+use notify::event::{DataChange::Size, EventKind::Modify, ModifyKind::Data};
 
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
 
 fn usage(args: &[String]) {
     eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
+}
+
+fn follow(name: &str, total: usize) -> Result {
+    let path = Path::new(name);
+    let file = BufReader::new(
+        File::open(&path).map_err(|e| Error::new(1, format!("Could not open file {name}: {e}")))?,
+    );
+
+    let config = if RecommendedWatcher::kind() == WatcherKind::PollWatcher {
+        Config::default()
+            .with_poll_interval(Duration::from_millis(100))
+            .with_compare_contents(true)
+    } else {
+        Config::default()
+    };
+
+    let (tx, rx) = std::sync::mpsc::channel();
+    let mut watcher = RecommendedWatcher::new(tx, config)
+        .map_err(|e| Error::new(1, format!("Could not watch file {name}: {e}")))?;
+
+    watcher
+        .watch(path.as_ref(), RecursiveMode::NonRecursive)
+        .map_err(|e| Error::new(1, format!("Could not watch file {name}: {e}")))?;
+
+    // Print initial lines
+    let mut line_iter = file.lines();
+    let mut buff = VecDeque::with_capacity(total);
+    line_iter
+        .by_ref()
+        .map(|l| add_line(&mut buff, l, total))
+        .collect::<Result<Vec<_>, Error>>()
+        .map(|_| ())?;
+
+    buff.into_iter().for_each(|l| println!("{l}"));
+
+    for res in rx {
+        match res {
+            Ok(event) => {
+                if event.kind == Modify(Data(Size)) {
+                    let mut buff = VecDeque::new();
+                    line_iter
+                        .by_ref()
+                        .map(|l| add_line(&mut buff, l, total))
+                        .collect::<Result<Vec<_>, Error>>()
+                        .map(|_| ())?;
+
+                    buff.into_iter().for_each(|l| println!("{l}"));
+                }
+            }
+            Err(e) => return Err(Error::new(1, format!("Failed to watch file {name}: {e}"))),
+        }
+    }
+
+    Ok(())
 }
 
 fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
@@ -61,9 +119,11 @@ fn output((file, total): (BufInput, usize)) -> Result {
 pub fn util_tail(args: Vec<String>) -> Result {
     let mut total = 10usize; // POSIX default
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
+    let mut do_stream = false;
 
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
+            Opt::Short('f') => do_stream = true,
             Opt::Short('n') => match usize::from_str(opts.value().unwrap()) {
                 Ok(result) => total = result,
                 Err(e) => {
@@ -75,6 +135,16 @@ pub fn util_tail(args: Vec<String>) -> Result {
                 return Ok(());
             }
             _ => {}
+        }
+    }
+
+    if do_stream {
+        // We only care about the first argument in this case
+        if let Some(name) = opts.positionals().nth(0) {
+            // POSIX sez we ignore -f for stdin
+            if name != "-" {
+                return follow(name, total);
+            }
         }
     }
 
