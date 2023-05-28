@@ -11,7 +11,7 @@ const LLVM_VERSION: &str = env!("VERGEN_RUSTC_LLVM_VERSION");
 const OS_NAME: &str = env!("VERGEN_SYSINFO_NAME");
 const OS_VERSION: &str = env!("VERGEN_SYSINFO_OS_VERSION");
 
-const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+const AUTHORS: &str = env!("REUTILS_PKG_AUTHORS");
 
 pub fn about(verbose: bool) {
     eprintln!("reutils v{VERSION} (git: {GIT_REVISION})");
@@ -24,7 +24,7 @@ pub fn about(verbose: bool) {
             eprintln!("Cargo host: {CARGO_HOST_TRIPLE}");
         }
     }
-    eprintln!("Copyright (C) 2023 {}", AUTHORS.replace(':', ", "));
+    eprintln!("Copyright (C) 2023 {AUTHORS}");
     eprintln!("This program is free software; you may redistribute it under the terms of");
     eprintln!("the GNU General Public License version 2 ONLY.");
     eprintln!("This program has absolutely no warranty.");
