@@ -13,10 +13,15 @@ fn usage(arg0: &str) -> Error {
     Error::new_nomsg(1)
 }
 
+#[cfg(not(target_os = "windows"))]
 fn block_sigalrm() {
     unsafe {
         libc::signal(libc::SIGALRM, libc::SIG_IGN);
     }
+}
+
+#[cfg(target_os = "windows")]
+fn block_sigalrm() {
 }
 
 pub fn util_sleep(args: Vec<String>) -> Result {
