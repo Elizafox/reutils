@@ -28,7 +28,7 @@ fn usage(args: &[String]) {
 fn follow(name: &str, total: usize) -> Result {
     let path = Path::new(name);
     let file = BufReader::new(
-        File::open(&path).map_err(|e| Error::new(1, format!("Could not open file {name}: {e}")))?,
+        File::open(path).map_err(|e| Error::new(1, format!("Could not open file {name}: {e}")))?,
     );
 
     let config = if RecommendedWatcher::kind() == WatcherKind::PollWatcher {
@@ -88,7 +88,7 @@ fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
 
         let f = BufInput::File(BufReader::new(f));
 
-        return Ok((f, total));
+        Ok((f, total))
     }
 }
 
@@ -140,7 +140,7 @@ pub fn util_tail(args: Vec<String>) -> Result {
 
     if do_stream {
         // We only care about the first argument in this case
-        if let Some(name) = opts.positionals().nth(0) {
+        if let Some(name) = opts.positionals().next() {
             // POSIX sez we ignore -f for stdin
             if name != "-" {
                 return follow(name, total);
