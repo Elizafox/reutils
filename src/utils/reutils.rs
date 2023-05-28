@@ -11,7 +11,6 @@ use crate::version;
 
 pub fn util_reutils(args: Vec<String>) -> Result {
     if args.len() <= 1 {
-        // FIXME FIXME FIXME!!!
         eprintln!("reutils v{}-{}", version::VERSION, version::GIT_REVISION);
         eprintln!("Copyright (C) 2023 {}", version::AUTHORS.replace(":", ", "));
         eprintln!("This program is free software; you may redistribute it under the terms of");
