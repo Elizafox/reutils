@@ -16,7 +16,7 @@ use std::time::Duration;
 
 use getargs::{Opt, Options};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
-use notify::event::{EventKind::Modify, ModifyKind::Any};
+use notify::event::EventKind::Modify;
 
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
@@ -61,15 +61,18 @@ fn follow(name: &str, total: usize) -> Result {
     for res in rx {
         match res {
             Ok(event) => {
-                if event.kind == Modify(Any) {
-                    let mut buff = VecDeque::new();
-                    line_iter
-                        .by_ref()
-                        .map(|l| add_line(&mut buff, l, total))
-                        .collect::<Result<Vec<_>, Error>>()
-                        .map(|_| ())?;
+                match event.kind {
+                    Modify(_) => {
+                        let mut buff = VecDeque::new();
+                        line_iter
+                            .by_ref()
+                            .map(|l| add_line(&mut buff, l, total))
+                            .collect::<Result<Vec<_>, Error>>()
+                            .map(|_| ())?;
 
-                    buff.into_iter().for_each(|l| println!("{l}"));
+                        buff.into_iter().for_each(|l| println!("{l}"));
+                    },
+                    _ => {},
                 }
             }
             Err(e) => return Err(Error::new(1, format!("Failed to watch file {name}: {e}"))),
