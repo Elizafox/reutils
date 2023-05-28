@@ -1,6 +1,6 @@
 /* utils/reutils.rs - Implementation of the reutils command
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 use std::process::Command;

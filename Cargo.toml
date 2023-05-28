@@ -2,7 +2,15 @@
 name = "reutils"
 version = "0.1.0"
 edition = "2021"
+description = "A reimplementation of busybox in rust"
+readme = "README.md"
+repository = "https://github.com/Elizafox/reutils"
+license = "GPL-2.0-only"
+publish = false  # Not ready yet
 authors = ["Elizabeth Myers", "Malina Thomas"]
+
+[badges]
+maintenance = { status = "experimental" }
 
 [profile.dev]
 debug = true

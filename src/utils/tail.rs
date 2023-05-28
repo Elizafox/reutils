@@ -1,6 +1,6 @@
 /* utils/tail.rs - implementation of tail
  * Copyright (C) 2023 Elizabeth Myers, Malina Thomas. All rights reserved.
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 /* TODO: a more efficient implementation reading backwards from the file is in order.
