@@ -61,18 +61,15 @@ fn follow(name: &str, total: usize) -> Result {
     for res in rx {
         match res {
             Ok(event) => {
-                match event.kind {
-                    Modify(_) => {
-                        let mut buff = VecDeque::new();
-                        line_iter
-                            .by_ref()
-                            .map(|l| add_line(&mut buff, l, total))
-                            .collect::<Result<Vec<_>, Error>>()
-                            .map(|_| ())?;
+                if let Modify(_) = event.kind {
+                    let mut buff = VecDeque::new();
+                    line_iter
+                        .by_ref()
+                        .map(|l| add_line(&mut buff, l, total))
+                        .collect::<Result<Vec<_>, Error>>()
+                        .map(|_| ())?;
 
-                        buff.into_iter().for_each(|l| println!("{l}"));
-                    },
-                    _ => {},
+                    buff.into_iter().for_each(|l| println!("{l}"));
                 }
             }
             Err(e) => return Err(Error::new(1, format!("Failed to watch file {name}: {e}"))),
