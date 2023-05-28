@@ -27,7 +27,8 @@ pub fn util_sleep(args: Vec<String>) -> Result {
         .ok_or_else(|| usage(&args[0]))?
         .parse::<f64>()
         .map_err(|_| usage(&args[0]))?
-        * 1e9) as u64;
+        * 1e9)
+        .round() as u64;
 
     sleep(Duration::from_nanos(sleep_nsec));
 
