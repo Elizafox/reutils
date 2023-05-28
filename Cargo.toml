@@ -25,7 +25,7 @@ lto = true
 codegen-units = 1
 
 [build_dependencies]
-crate-git-revision = "0.0.6"
+vergen = { version = "8.2.1", features = ["build", "cargo", "git", "gitoxide", "rustc", "si"] }
 
 [dependencies]
 getargs = "0.5.0"

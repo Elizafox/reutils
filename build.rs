@@ -3,6 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-fn main() {
-    crate_git_revision::init();
+use std::error::Error;
+use vergen::EmitBuilder;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    EmitBuilder::builder()
+        .all_build()
+        .all_cargo()
+        .all_git()
+        .all_rustc()
+        .all_sysinfo()
+        .git_sha(true)
+        .emit()?;
+    Ok(())
 }

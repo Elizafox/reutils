@@ -7,15 +7,11 @@ use std::process::Command;
 
 use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
-use crate::version;
+use crate::version::about;
 
 pub fn util_reutils(args: Vec<String>) -> Result {
     if args.len() <= 1 {
-        eprintln!("reutils v{}-{}", version::VERSION, version::GIT_REVISION);
-        eprintln!("Copyright (C) 2023 {}", version::AUTHORS.replace(':', ", "));
-        eprintln!("This program is free software; you may redistribute it under the terms of");
-        eprintln!("the GNU General Public License version 2 ONLY.");
-        eprintln!("TThis program has absolutely no warranty.");
+        about(true);
         return Err(Error::new_nomsg(1));
     }
 
