@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .all_git()
         .all_rustc()
         .all_sysinfo()
-        .git_sha(true)
+        .git_describe(true, true, None)
         .emit()?;
     Ok(())
 }

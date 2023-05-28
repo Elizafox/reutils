@@ -25,7 +25,7 @@ lto = true
 codegen-units = 1
 
 [build_dependencies]
-vergen = { version = "8.2.1", features = ["build", "cargo", "git", "gitoxide", "rustc", "si"] }
+vergen = { version = "8.2.1", features = ["build", "cargo", "git", "git2", "rustc", "si"] }
 
 [dependencies]
 getargs = "0.5.0"
