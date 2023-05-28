@@ -6,7 +6,7 @@
 use std::thread::sleep;
 use std::time::Duration;
 
-use crate::err::{Result, Error};
+use crate::err::{Error, Result};
 
 fn usage(arg0: &str) -> Error {
     eprintln!("Usage: {arg0} seconds");
@@ -20,7 +20,7 @@ fn block_sigalrm() {
 }
 
 pub fn util_sleep(args: Vec<String>) -> Result {
-    block_sigalrm();  // POSIX sez this is a valid option
+    block_sigalrm(); // POSIX sez this is a valid option
 
     let sleep_nsec = (args
         .get(1)

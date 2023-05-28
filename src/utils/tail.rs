@@ -15,8 +15,8 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use getargs::{Opt, Options};
-use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
 use notify::event::EventKind::Modify;
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
 
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
