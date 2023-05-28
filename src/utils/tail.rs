@@ -16,7 +16,7 @@ use std::time::Duration;
 
 use getargs::{Opt, Options};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
-use notify::event::{DataChange::Size, EventKind::Modify, ModifyKind::Data};
+use notify::event::{EventKind::Modify, ModifyKind::Any};
 
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
@@ -33,7 +33,7 @@ fn follow(name: &str, total: usize) -> Result {
 
     let config = if RecommendedWatcher::kind() == WatcherKind::PollWatcher {
         Config::default()
-            .with_poll_interval(Duration::from_millis(100))
+            .with_poll_interval(Duration::from_millis(500))
             .with_compare_contents(true)
     } else {
         Config::default()
@@ -61,7 +61,7 @@ fn follow(name: &str, total: usize) -> Result {
     for res in rx {
         match res {
             Ok(event) => {
-                if event.kind == Modify(Data(Size)) {
+                if event.kind == Modify(Any) {
                     let mut buff = VecDeque::new();
                     line_iter
                         .by_ref()
