@@ -12,7 +12,7 @@ See the LICENSE file for the actual license.
 
 Contributing
 ============
-Contributions are always welcome. Please read the [Code of Conduct ./CODE_OF_CONDUCT.md] before contributing.
+Contributions are always welcome. Please read the [Code of Conduct](/CODE_OF_CONDUCT.md) before contributing.
 
 TODO
 ====
