@@ -16,7 +16,7 @@ fn dirname(path: &str) -> Result<String, Error> {
     Ok(match Path::new(&path).parent() {
         Some(base) => String::from(
             base.to_str()
-                .ok_or_else(|| Error::new(1, format!("Could not convert path")))?,
+                .ok_or_else(|| Error::new(1, "Could not convert path".to_string()))?,
         ),
         None => String::from(path),
     })
