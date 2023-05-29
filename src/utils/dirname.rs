@@ -15,9 +15,10 @@ fn usage(arg0: &str) -> Error {
 
 fn dirname(path: &str) -> Result<String, Error> {
     let dn;
+    let path = CString::new(path)
+        .map_err(|e| Error::new(1, format!("Could not get C string from path: {e}")))?;
+
     unsafe {
-        let path = CString::new(path)
-            .map_err(|e| Error::new(1, format!("Could not get C string from path: {e}")))?;
         let mut path_buf: Vec<libc::c_char> = transmute(path.into_bytes_with_nul());
         dn = CStr::from_ptr(libc::dirname(path_buf.as_mut_ptr()))
             .to_str()
