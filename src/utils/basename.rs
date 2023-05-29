@@ -13,6 +13,12 @@ fn usage(arg0: &str) -> Error {
     Error::new_nomsg(1)
 }
 
+#[cfg(target_os = "linux")]
+const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::posix_basename;
+
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
+const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::basename;
+
 fn basename(path: &str) -> Result<String, Error> {
     let dn;
     let path = CString::new(path)
@@ -20,7 +26,7 @@ fn basename(path: &str) -> Result<String, Error> {
 
     unsafe {
         let mut path_buf: Vec<libc::c_char> = transmute(path.into_bytes_with_nul());
-        dn = CStr::from_ptr(libc::basename(path_buf.as_mut_ptr()))
+        dn = CStr::from_ptr(LIBC_BASENAME(path_buf.as_mut_ptr()))
             .to_str()
             .map_err(|e| Error::new(1, format!("Could not convert string: {e}")))?;
     }
