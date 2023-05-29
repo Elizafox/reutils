@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::io::{Read, Write, stdin, stdout};
 use std::fs::File;
+use std::io::{stdin, stdout, Read, Write};
 
-use getargs::{Options, Opt};
+use getargs::{Opt, Options};
 
 use crate::bufoutput::BufOutput;
 use crate::err::{Error, Result};
@@ -39,22 +39,19 @@ pub fn util(args: &[String]) -> Result {
         }
     }
 
-    let mut files: Vec<(&str, BufOutput)> = vec![
-        ("stdout", BufOutput::Standard(stdout().lock()))
-    ];
+    let mut files: Vec<(&str, BufOutput)> = vec![("stdout", BufOutput::Standard(stdout().lock()))];
 
     for filename in opts.positionals() {
-        let file = BufOutput::File(
-            if do_append {
-                File::options()
-                    .read(false)
-                    .append(true)
-                    .open(filename)
-                    .map_err(|e| Error::new(1, format!("Could not open file {filename}: {e}")))?
-            } else {
-                File::create(filename)
-                    .map_err(|e| Error::new(1, format!("Could not open file {filename}: {e}")))?
-            });
+        let file = BufOutput::File(if do_append {
+            File::options()
+                .read(false)
+                .append(true)
+                .open(filename)
+                .map_err(|e| Error::new(1, format!("Could not open file {filename}: {e}")))?
+        } else {
+            File::create(filename)
+                .map_err(|e| Error::new(1, format!("Could not open file {filename}: {e}")))?
+        });
 
         files.push((filename, file));
     }
@@ -72,8 +69,7 @@ pub fn util(args: &[String]) -> Result {
         }
 
         for (filename, file) in &mut files {
-            file
-                .write_all(&buff[..len])
+            file.write_all(&buff[..len])
                 .map_err(|e| Error::new(1, format!("Could not write to file {filename}: {e}")))?;
         }
     }
