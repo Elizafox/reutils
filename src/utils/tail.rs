@@ -88,8 +88,8 @@ fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
         return Ok((BufInput::Standard(io::stdin().lock()), total));
     }
 
-    let f = File::open(name)
-        .map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
+    let f =
+        File::open(name).map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
 
     let f = BufInput::File(BufReader::new(f));
 

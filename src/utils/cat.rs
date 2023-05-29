@@ -51,10 +51,7 @@ pub fn util(args: &[String]) -> Result {
 
     for (filename, mut file) in files {
         if let Err(e) = io::copy(&mut file, &mut io::stdout()) {
-            return Err(Error::new(
-                1,
-                format!("Could not write to {filename}: {e}"),
-            ));
+            return Err(Error::new(1, format!("Could not write to {filename}: {e}")));
         }
     }
 

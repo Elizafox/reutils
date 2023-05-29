@@ -77,10 +77,7 @@ pub fn util(args: &[String]) -> Result {
                     println!("{line}");
                 }
                 Err(e) => {
-                    return Err(Error::new(
-                        1,
-                        format!("Error reading from {filename}: {e}"),
-                    ));
+                    return Err(Error::new(1, format!("Error reading from {filename}: {e}")));
                 }
             }
         }

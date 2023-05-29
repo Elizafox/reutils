@@ -26,9 +26,7 @@ fn block_sigalrm() {}
 pub fn util(args: &[String]) -> Result {
     block_sigalrm(); // POSIX sez this is a valid option
 
-    let arg = args
-        .get(1)
-        .ok_or_else(|| usage(&args[0]))?;
+    let arg = args.get(1).ok_or_else(|| usage(&args[0]))?;
 
     if arg.starts_with('-') {
         return Err(usage(&args[0]));
