@@ -9,6 +9,7 @@ mod sleep;
 mod tail;
 mod tee;
 mod true_;
+mod tty;
 
 use crate::err::Result;
 
@@ -32,5 +33,6 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "sleep" => ("/bin/sleep", sleep::util),
     "tail" => ("/usr/bin/tail", tail::util),
     "tee" => ("/usr/bin/tee", tee::util),
-    "true" => ("/bin/true", true_::util)
+    "true" => ("/bin/true", true_::util),
+    "tty" => ("/usr/bin/tty", tty::util),
 };
