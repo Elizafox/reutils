@@ -5,6 +5,6 @@
 
 use crate::err::{Error, Result};
 
-pub fn util(_args: &[String]) -> Result {
+pub const fn util(_args: &[String]) -> Result {
     Err(Error::new_nomsg(1))
 }

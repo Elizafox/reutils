@@ -56,7 +56,9 @@ fn follow(name: &str, total: usize) -> Result {
         .collect::<Result<Vec<_>, Error>>()
         .map(|_| ())?;
 
-    buff.into_iter().for_each(|l| println!("{l}"));
+    for line in buff {
+        println!("{line}");
+    }
 
     for res in rx {
         match res {
@@ -69,7 +71,9 @@ fn follow(name: &str, total: usize) -> Result {
                         .collect::<Result<Vec<_>, Error>>()
                         .map(|_| ())?;
 
-                    buff.into_iter().for_each(|l| println!("{l}"));
+                    for line in buff {
+                        println!("{line}");
+                    }
                 }
             }
             Err(e) => return Err(Error::new(1, format!("Failed to watch file {name}: {e}"))),
@@ -111,7 +115,9 @@ fn output((file, total): (BufInput, usize)) -> Result {
         .collect::<Result<Vec<_>, Error>>()
         .map(|_| ())?;
 
-    buff.into_iter().for_each(|l| println!("{l}"));
+    for line in buff {
+        println!("{line}");
+    }
 
     Ok(())
 }

@@ -26,10 +26,22 @@ fn block_sigalrm() {}
 pub fn util(args: &[String]) -> Result {
     block_sigalrm(); // POSIX sez this is a valid option
 
+    let arg = args
+        .get(1)
+        .ok_or_else(|| usage(&args[0]))?;
+
+    if arg.starts_with('-') {
+        return Err(usage(&args[0]));
+    }
+
+    // We check the sign above, so we don't care.
+    // We also don't have a better method to convert, unless we use nightly, so meh.
+    #[allow(clippy::cast_sign_loss)]
+    #[allow(clippy::cast_possible_truncation)]
     let sleep_nsec = (args
         .get(1)
         .ok_or_else(|| usage(&args[0]))?
-        .parse::<f64>()
+        .parse::<f32>()
         .map_err(|_| usage(&args[0]))?
         * 1e9)
         .round() as u64;

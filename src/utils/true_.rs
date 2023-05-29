@@ -5,6 +5,7 @@
 
 use crate::err::Result;
 
-pub fn util(_args: &[String]) -> Result {
+#[allow(clippy::unnecessary_wraps)]
+pub const fn util(_args: &[String]) -> Result {
     Ok(())
 }

@@ -23,13 +23,11 @@ pub fn util(args: &[String]) -> Result {
 
     let status = Command::new(&args[1]).args(args.iter().skip(1)).status();
     match status {
-        Ok(status) => match status.code() {
-            Some(code) => {
-                eprintln!("Exited with status code {code}");
-                Err(Error::new(code, format!("Exited with status code {code}")))
-            }
-            None => Err(Error::new(255, "Process terminated by signal".to_string())),
-        },
+        Ok(status) => status
+            .code()
+            .map_or_else(
+                || Err(Error::new(255, "Process terminated by signal".to_string())),
+                |code| Err(Error::new(code, format!("Exited with status code {code}")))),
         Err(e) => Err(Error::new(255, format!("Could not execute command: {e}"))),
     }
 }

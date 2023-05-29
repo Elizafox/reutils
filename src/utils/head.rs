@@ -65,7 +65,8 @@ pub fn util(args: &[String]) -> Result {
     for (filename, file) in files {
         let mut count = 0u64;
 
-        for line in file.lines() {
+        let lines = file.lines();
+        for line in lines {
             count += 1;
             if count > total {
                 break;
