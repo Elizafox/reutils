@@ -25,11 +25,11 @@ pub fn util(args: &[String]) -> Result {
             Opt::Short('n') => match u64::from_str(opts.value().unwrap()) {
                 Ok(result) => total = result,
                 Err(e) => {
-                    return Err(Error::new(1, format!("Invalid total: {}", e)));
+                    return Err(Error::new(1, format!("Invalid total: {e}")));
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
-                usage(&args);
+                usage(args);
                 return Ok(());
             }
             _ => {}
@@ -50,7 +50,7 @@ pub fn util(args: &[String]) -> Result {
                 Err(e) => {
                     return Err(Error::new(
                         1,
-                        format!("Could not open file: {}: {}", filename, e),
+                        format!("Could not open file: {filename}: {e}"),
                     ));
                 }
             }

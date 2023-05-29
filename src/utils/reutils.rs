@@ -17,7 +17,7 @@ pub fn util(args: &[String]) -> Result {
 
     // Determine if what we're executing is a builtin
     // If it is, run it and leave.
-    if let Some(util_entry) = DISPATCH_TABLE.get(&args[1]).cloned() {
+    if let Some(util_entry) = DISPATCH_TABLE.get(&args[1]).copied() {
         return util_entry.1(&args[1..]);
     }
 
@@ -30,6 +30,6 @@ pub fn util(args: &[String]) -> Result {
             }
             None => Err(Error::new(255, "Process terminated by signal".to_string())),
         },
-        Err(e) => Err(Error::new(255, format!("Could not execute command: {}", e))),
+        Err(e) => Err(Error::new(255, format!("Could not execute command: {e}"))),
     }
 }

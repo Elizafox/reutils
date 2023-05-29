@@ -21,8 +21,8 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
 
-fn usage(args: &[String]) {
-    eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
+fn usage(arg0: &str) {
+    eprintln!("Usage: {arg0} [-n] lines [-h|--help] [FILE] ...");
 }
 
 fn follow(name: &str, total: usize) -> Result {
@@ -131,7 +131,7 @@ pub fn util(args: &[String]) -> Result {
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
-                usage(&args);
+                usage(&args[0]);
                 return Ok(());
             }
             _ => {}

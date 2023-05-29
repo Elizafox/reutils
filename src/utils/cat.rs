@@ -15,7 +15,6 @@ pub fn util(args: &[String]) -> Result {
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
-            Opt::Short('u') => { /* No-op */ }
             Opt::Short('h') | Opt::Long("help") => {
                 eprintln!("Usage: {} [-u] [-h|--help] [FILE] ...", args[0]);
                 return Ok(());
@@ -38,7 +37,7 @@ pub fn util(args: &[String]) -> Result {
                 Err(e) => {
                     return Err(Error::new(
                         1,
-                        format!("Could not open file: {}: {}", filename, e),
+                        format!("Could not open file: {filename}: {e}"),
                     ));
                 }
             }
@@ -54,13 +53,13 @@ pub fn util(args: &[String]) -> Result {
         if let Err(e) = io::copy(&mut file, &mut io::stdout()) {
             return Err(Error::new(
                 1,
-                format!("Could not write to {}: {}", filename, e),
+                format!("Could not write to {filename}: {e}"),
             ));
         }
     }
 
     if let Err(e) = io::stdout().flush() {
-        return Err(Error::new(1, format!("Could not write to stdout: {}", e)));
+        return Err(Error::new(1, format!("Could not write to stdout: {e}")));
     }
 
     Ok(())
