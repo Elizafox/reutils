@@ -11,15 +11,13 @@ fn usage(arg0: &str) -> Error {
 }
 
 #[cfg(target_os = "windows")]
-fn basename (path: &str) -> Result<String, Error> {
+fn basename(path: &str) -> Result<String, Error> {
     use std::path::Path;
     Ok(match Path::new(&path).file_name() {
-        Some(base) => {
-            String::from(
-                base
-                    .to_str()
-                    .ok_or_else(|| Error::new(1, format!("Could not convert path")))?)
-        },
+        Some(base) => String::from(
+            base.to_str()
+                .ok_or_else(|| Error::new(1, format!("Could not convert path")))?,
+        ),
         None => String::from(path),
     })
 }
@@ -30,10 +28,12 @@ fn basename(path: &str) -> Result<String, Error> {
      * Workaround libc crate bug; it doesn't export posix_basename on BSD for some reason.
      */
     #[cfg(target_os = "linux")]
-    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::posix_basename;
+    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char =
+        libc::posix_basename;
 
     #[cfg(not(target_os = "linux"))]
-    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::basename;
+    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char =
+        libc::basename;
 
     use std::ffi::{CStr, CString};
     use std::mem::transmute;

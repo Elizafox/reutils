@@ -11,15 +11,13 @@ fn usage(arg0: &str) -> Error {
 }
 
 #[cfg(target_os = "windows")]
-fn dirname (path: &str) -> Result<String, Error> {
+fn dirname(path: &str) -> Result<String, Error> {
     use std::path::Path;
     Ok(match Path::new(&path).parent() {
-        Some(base) => {
-            String::from(
-                base
-                    .to_str()
-                    .ok_or_else(|| Error::new(1, format!("Could not convert path")))?)
-        },
+        Some(base) => String::from(
+            base.to_str()
+                .ok_or_else(|| Error::new(1, format!("Could not convert path")))?,
+        ),
         None => String::from(path),
     })
 }
