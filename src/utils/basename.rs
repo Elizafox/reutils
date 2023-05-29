@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::ffi::{CStr, CString};
-use std::mem::transmute;
-
 use crate::err::{Error, Result};
 
 fn usage(arg0: &str) -> Error {
@@ -13,13 +10,34 @@ fn usage(arg0: &str) -> Error {
     Error::new_nomsg(1)
 }
 
-#[cfg(target_os = "linux")]
-const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::posix_basename;
+#[cfg(target_os = "windows")]
+fn basename (path: &str) -> Result<String, Error> {
+    use std::path::Path;
+    Ok(match Path::new(&path).file_name() {
+        Some(base) => {
+            String::from(
+                base
+                    .to_str()
+                    .ok_or_else(|| Error::new(1, format!("Could not convert path")))?)
+        },
+        None => String::from(path),
+    })
+}
 
-#[cfg(not(any(target_os = "linux", target_os = "windows")))]
-const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::basename;
-
+#[cfg(not(target_os = "windows"))]
 fn basename(path: &str) -> Result<String, Error> {
+    /* XXX hack hack hack hack hack hack hack hack hack!!!
+     * Workaround libc crate bug; it doesn't export posix_basename on BSD for some reason.
+     */
+    #[cfg(target_os = "linux")]
+    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::posix_basename;
+
+    #[cfg(not(target_os = "linux"))]
+    const LIBC_BASENAME: unsafe extern "C" fn(*mut libc::c_char) -> *mut libc::c_char = libc::basename;
+
+    use std::ffi::{CStr, CString};
+    use std::mem::transmute;
+
     let dn;
     let path = CString::new(path)
         .map_err(|e| Error::new(1, format!("Could not get C string from path: {e}")))?;

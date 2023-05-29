@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::ffi::{CStr, CString};
-use std::mem::transmute;
-
 use crate::err::{Error, Result};
 
 fn usage(arg0: &str) -> Error {
@@ -13,7 +10,25 @@ fn usage(arg0: &str) -> Error {
     Error::new_nomsg(1)
 }
 
+#[cfg(target_os = "windows")]
+fn dirname (path: &str) -> Result<String, Error> {
+    use std::path::Path;
+    Ok(match Path::new(&path).parent() {
+        Some(base) => {
+            String::from(
+                base
+                    .to_str()
+                    .ok_or_else(|| Error::new(1, format!("Could not convert path")))?)
+        },
+        None => String::from(path),
+    })
+}
+
+#[cfg(not(target_os = "windows"))]
 fn dirname(path: &str) -> Result<String, Error> {
+    use std::ffi::{CStr, CString};
+    use std::mem::transmute;
+
     let dn;
     let path = CString::new(path)
         .map_err(|e| Error::new(1, format!("Could not get C string from path: {e}")))?;
