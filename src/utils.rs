@@ -1,4 +1,5 @@
 mod cat;
+mod dirname;
 mod false_;
 mod head;
 mod reutils;
@@ -9,6 +10,7 @@ mod true_;
 use crate::err::Result;
 
 use crate::utils::cat::util_cat;
+use crate::utils::dirname::util_dirname;
 use crate::utils::false_::util_false;
 use crate::utils::head::util_head;
 use crate::utils::reutils::util_reutils;
@@ -27,6 +29,7 @@ type MapValue = (&'static str, DispatchFn);
 */
 pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! {
     "cat" => ("/bin/cat", util_cat),
+    "dirname" => ("/usr/bin/dirname", util_dirname),
     "false" => ("/bin/false", util_false),
     "head" => ("/usr/bin/head", util_head),
     "reutils" => ("/usr/sbin/reutils", util_reutils),
