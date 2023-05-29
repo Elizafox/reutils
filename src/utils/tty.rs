@@ -27,7 +27,7 @@ fn ttyname() -> Result<String> {
         .to_str()
         .map_err(|e| Error::new(1, format!("Could not get TTY name: {e}")))?;
 
-    return Ok(String::from(name));
+    Ok(String::from(name))
 }
 
 #[cfg(windows)]
