@@ -16,7 +16,7 @@ fn split_authors(s: &str) -> String {
         _ => {
             let (all_but_last, last) = authors.split_at(authors.len() - 1);
             String::from(format!("{}, and {}", all_but_last.join(", "), last[0]))
-        },
+        }
     }
 }
 
@@ -30,8 +30,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         .git_describe(true, true, None)
         .emit()?;
 
-    println!("cargo:rustc-env=REUTILS_PKG_AUTHORS={}",
-        split_authors(env!("CARGO_PKG_AUTHORS")));
+    println!(
+        "cargo:rustc-env=REUTILS_PKG_AUTHORS={}",
+        split_authors(env!("CARGO_PKG_AUTHORS"))
+    );
 
     Ok(())
 }

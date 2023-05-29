@@ -21,8 +21,7 @@ fn block_sigalrm() {
 }
 
 #[cfg(target_os = "windows")]
-fn block_sigalrm() {
-}
+fn block_sigalrm() {}
 
 pub fn util_sleep(args: Vec<String>) -> Result {
     block_sigalrm(); // POSIX sez this is a valid option
