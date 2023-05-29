@@ -12,10 +12,10 @@ fn split_authors(s: &str) -> String {
     match authors.len() {
         0 => String::from("Unknown author"),
         1 => String::from(authors[0]),
-        2 => String::from(authors.join(" and ")),
+        2 => authors.join(" and "),
         _ => {
             let (all_but_last, last) = authors.split_at(authors.len() - 1);
-            String::from(format!("{}, and {}", all_but_last.join(", "), last[0]))
+            format!("{}, and {}", all_but_last.join(", "), last[0])
         }
     }
 }

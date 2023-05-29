@@ -38,7 +38,7 @@ fn dirname(path: &str) -> Result<String, Error> {
             .map_err(|e| Error::new(1, format!("Could not convert string: {e}")))?;
     }
 
-    return Ok(String::from(dn));
+    Ok(String::from(dn))
 }
 
 pub fn util_dirname(args: Vec<String>) -> Result {
