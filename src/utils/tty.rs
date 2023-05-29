@@ -7,16 +7,14 @@ use crate::err::{Error, Result};
 
 #[cfg(unix)]
 fn ttyname() -> Result<String> {
+    use std::ffi::CStr;
     use std::io;
     use std::os::fd::{AsFd, AsRawFd, BorrowedFd};
-    use std::ffi::CStr;
 
     let stdin = io::stdin();
     let bfd: BorrowedFd<'_> = stdin.as_fd();
     let fd = bfd.as_raw_fd();
-    let name_ptr = unsafe {
-        libc::ttyname(fd)
-    };
+    let name_ptr = unsafe { libc::ttyname(fd) };
 
     if name_ptr.is_null() {
         // Uh oh!
@@ -24,9 +22,7 @@ fn ttyname() -> Result<String> {
         return Err(Error::new(1, format!("Could not get TTY name: {e}")));
     }
 
-    let c_name = unsafe {
-        CStr::from_ptr(name_ptr)
-    };
+    let c_name = unsafe { CStr::from_ptr(name_ptr) };
     let name = c_name
         .to_str()
         .map_err(|e| Error::new(1, format!("Could not get TTY name: {e}")))?;
