@@ -1,6 +1,7 @@
 mod basename;
 mod cat;
 mod dirname;
+mod echo;
 mod false_;
 mod head;
 mod reutils;
@@ -23,6 +24,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "basename" => ("/usr/bin/basename", basename::util),
     "cat" => ("/bin/cat", cat::util),
     "dirname" => ("/usr/bin/dirname", dirname::util),
+    "echo" => ("/bin/echo", echo::util),
     "false" => ("/bin/false", false_::util),
     "head" => ("/usr/bin/head", head::util),
     "reutils" => ("/usr/sbin/reutils", reutils::util),
