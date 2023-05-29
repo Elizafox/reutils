@@ -23,7 +23,6 @@ fn usage(arg0: &str) {
     eprintln!("Usage: {arg0} [-ai] [files]...");
 }
 
-#[allow(clippy::unnecessary_wraps)]
 pub fn util(args: &[String]) -> Result {
     let mut do_append = false;
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
