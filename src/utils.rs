@@ -7,6 +7,7 @@ mod head;
 mod reutils;
 mod sleep;
 mod tail;
+mod tee;
 mod true_;
 
 use crate::err::Result;
@@ -30,5 +31,6 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "reutils" => ("/usr/sbin/reutils", reutils::util),
     "sleep" => ("/bin/sleep", sleep::util),
     "tail" => ("/usr/bin/tail", tail::util),
+    "tee" => ("/usr/bin/tee", tee::util),
     "true" => ("/bin/true", true_::util)
 };

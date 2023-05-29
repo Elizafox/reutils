@@ -1,3 +1,8 @@
+/* bufinput.rs - wrapper around stdin and files
+ * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
 use std::fs;
 use std::io;
 

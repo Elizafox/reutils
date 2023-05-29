@@ -10,6 +10,7 @@
 #![warn(clippy::cargo)]
 
 mod bufinput;
+mod bufoutput;
 mod err;
 mod utils;
 mod version;
