@@ -1,3 +1,4 @@
+mod basename;
 mod cat;
 mod dirname;
 mod false_;
@@ -9,6 +10,7 @@ mod true_;
 
 use crate::err::Result;
 
+use crate::utils::basename::util_basename;
 use crate::utils::cat::util_cat;
 use crate::utils::dirname::util_dirname;
 use crate::utils::false_::util_false;
@@ -28,6 +30,7 @@ type MapValue = (&'static str, DispatchFn);
     Otherwise, reutils won't know about them!
 */
 pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! {
+    "basename" => ("/usr/bin/basename", util_basename),
     "cat" => ("/bin/cat", util_cat),
     "dirname" => ("/usr/bin/dirname", util_dirname),
     "false" => ("/bin/false", util_false),
