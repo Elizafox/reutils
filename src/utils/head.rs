@@ -16,7 +16,7 @@ fn usage(args: &[String]) {
     eprintln!("Usage: {} [-n] lines [-h|--help] [FILE] ...", args[0]);
 }
 
-pub fn util_head(args: Vec<String>) -> Result {
+pub fn util(args: &[String]) -> Result {
     let mut total = 10u64; // POSIX default
 
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
@@ -73,12 +73,12 @@ pub fn util_head(args: Vec<String>) -> Result {
 
             match line {
                 Ok(line) => {
-                    println!("{}", line);
+                    println!("{line}");
                 }
                 Err(e) => {
                     return Err(Error::new(
                         1,
-                        format!("Error reading from {}: {}", filename, e),
+                        format!("Error reading from {filename}: {e}"),
                     ));
                 }
             }

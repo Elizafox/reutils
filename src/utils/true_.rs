@@ -5,6 +5,6 @@
 
 use crate::err::Result;
 
-pub fn util_true(_args: Vec<String>) -> Result {
+pub fn util(_args: &[String]) -> Result {
     Ok(())
 }

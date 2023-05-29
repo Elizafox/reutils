@@ -5,6 +5,6 @@
 
 use crate::err::{Error, Result};
 
-pub fn util_false(_args: Vec<String>) -> Result {
+pub fn util(_args: &[String]) -> Result {
     Err(Error::new_nomsg(1))
 }

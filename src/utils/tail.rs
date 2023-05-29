@@ -82,14 +82,14 @@ fn follow(name: &str, total: usize) -> Result {
 fn open((name, total): (&str, usize)) -> Result<(BufInput, usize)> {
     if name == "-" {
         return Ok((BufInput::Standard(io::stdin().lock()), total));
-    } else {
-        let f = File::open(name)
-            .map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
-
-        let f = BufInput::File(BufReader::new(f));
-
-        Ok((f, total))
     }
+
+    let f = File::open(name)
+        .map_err(|e| Error::new(1, format!("Failed to open file: {name}: {e}")))?;
+
+    let f = BufInput::File(BufReader::new(f));
+
+    Ok((f, total))
 }
 
 fn add_line(buff: &mut VecDeque<String>, line: Result<String, io::Error>, total: usize) -> Result {
@@ -116,7 +116,7 @@ fn output((file, total): (BufInput, usize)) -> Result {
     Ok(())
 }
 
-pub fn util_tail(args: Vec<String>) -> Result {
+pub fn util(args: &[String]) -> Result {
     let mut total = 10usize; // POSIX default
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     let mut do_stream = false;
@@ -127,7 +127,7 @@ pub fn util_tail(args: Vec<String>) -> Result {
             Opt::Short('n') => match usize::from_str(opts.value().unwrap()) {
                 Ok(result) => total = result,
                 Err(e) => {
-                    return Err(Error::new(1, format!("Invalid total: {}", e)));
+                    return Err(Error::new(1, format!("Invalid total: {e}")));
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
@@ -155,12 +155,12 @@ pub fn util_tail(args: Vec<String>) -> Result {
         .collect::<Result<Vec<_>>>()?;
 
     if files.is_empty() {
-        output((BufInput::Standard(io::stdin().lock()), total))
-    } else {
-        files
-            .into_iter()
-            .map(output)
-            .collect::<Result<Vec<_>>>()
-            .map(|_| ())
+        return output((BufInput::Standard(io::stdin().lock()), total));
     }
+
+    files
+        .into_iter()
+        .map(output)
+        .collect::<Result<Vec<_>>>()
+        .map(|_| ())
 }

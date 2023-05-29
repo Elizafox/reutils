@@ -22,7 +22,7 @@ fn basename(path: &str) -> Result<String, Error> {
     })
 }
 
-pub fn util_basename(args: Vec<String>) -> Result {
+pub fn util(args: &[String]) -> Result {
     let path = args.get(1).ok_or_else(|| usage(&args[0]))?;
 
     println!("{}", basename(path)?);

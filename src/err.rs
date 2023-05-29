@@ -7,14 +7,14 @@ pub struct Error {
 pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 impl Error {
-    pub fn new(code: i32, message: String) -> Self {
+    pub const fn new(code: i32, message: String) -> Self {
         Self {
             code,
             message: Some(message),
         }
     }
 
-    pub fn new_nomsg(code: i32) -> Self {
+    pub const fn new_nomsg(code: i32) -> Self {
         Self {
             code,
             message: None,

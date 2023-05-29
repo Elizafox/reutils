@@ -9,7 +9,7 @@ use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
 use crate::version::about;
 
-pub fn util_reutils(args: Vec<String>) -> Result {
+pub fn util(args: &[String]) -> Result {
     if args.len() <= 1 {
         about(true);
         return Err(Error::new_nomsg(1));
@@ -18,7 +18,7 @@ pub fn util_reutils(args: Vec<String>) -> Result {
     // Determine if what we're executing is a builtin
     // If it is, run it and leave.
     if let Some(util_entry) = DISPATCH_TABLE.get(&args[1]).cloned() {
-        return util_entry.1(args.into_iter().skip(1).collect());
+        return util_entry.1(&args[1..]);
     }
 
     let status = Command::new(&args[1]).args(args.iter().skip(1)).status();

@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+#![deny(clippy::all)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::cargo)]
+
 mod bufinput;
 mod err;
 mod utils;
@@ -53,12 +59,12 @@ fn main() {
     let util = get_util_name(&args[0]);
 
     // Attempt to find the utility
-    if let Some(util_entry) = DISPATCH_TABLE.get(&util).cloned() {
-        match util_entry.1(args) {
+    if let Some(util_entry) = DISPATCH_TABLE.get(&util).copied() {
+        match util_entry.1(args.as_slice()) {
             Ok(_) => exit(0),
             Err(e) => {
                 if let Some(message) = e.message {
-                    eprintln!("{}", message);
+                    eprintln!("{message}");
                 }
 
                 exit(e.code)
@@ -66,6 +72,6 @@ fn main() {
         }
     }
 
-    eprintln!("{}: utility not found", util);
+    eprintln!("{util}: utility not found");
     exit(1);
 }

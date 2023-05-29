@@ -11,7 +11,7 @@ use getargs::{Opt, Options};
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
 
-pub fn util_cat(args: Vec<String>) -> Result {
+pub fn util(args: &[String]) -> Result {
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
