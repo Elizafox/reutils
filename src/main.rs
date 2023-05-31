@@ -58,7 +58,7 @@ fn do_exit(result: Result) -> ! {
     match result {
         Ok(_) => exit(0),
         Err(e) => {
-            if e.message != None {
+            if e.message.is_some() {
                 eprintln!("{e}");
             }
 
