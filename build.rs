@@ -3,8 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+extern crate libc;
+
 use std::env;
 use std::error::Error;
+use std::ffi::CStr;
+
+use libc::{c_char, gethostname};
+
 use vergen::EmitBuilder;
 
 fn split_authors(s: &str) -> String {
@@ -18,6 +24,20 @@ fn split_authors(s: &str) -> String {
             format!("{}, and {}", all_but_last.join(", "), last[0])
         }
     }
+}
+
+fn gethostname_safe() -> String {
+    let mut buf: [c_char; 256usize] = [c_char::from(0); 256usize];
+    let res = unsafe { gethostname(buf.as_mut_ptr(), buf.len() - 1) };
+
+    if res != 0 {
+        // We don't care why, in this context.
+        return "unknown".to_string();
+    }
+
+    let cstr = unsafe { CStr::from_ptr(buf.as_ptr()) };
+
+    cstr.to_str().unwrap_or("unknown").to_string()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -34,6 +54,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         "cargo:rustc-env=REUTILS_PKG_AUTHORS={}",
         split_authors(env!("CARGO_PKG_AUTHORS"))
     );
+
+    println!("cargo:rustc-env=REUTILS_BUILD_HOST={}", gethostname_safe());
 
     Ok(())
 }
