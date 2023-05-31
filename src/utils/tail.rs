@@ -130,16 +130,16 @@ pub fn util(args: &[String]) -> Result {
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
             Opt::Short('f') => do_stream = true,
-            Opt::Short('n') => match usize::from_str(opts.value().unwrap()) {
-                Ok(result) => total = result,
-                Err(e) => {
-                    return Err(Error::new(1, format!("Invalid total: {e}")));
-                }
+            Opt::Short('n') => {
+                total = usize::from_str(opts
+                    .value()
+                    .map_err(|_| Error::new(1, "-n: no line count given".to_string()))?)
+                    .map_err(|e| Error::new(1, format!("Invalid total: {e}")))?;
             },
             Opt::Short('h') | Opt::Long("help") => {
                 usage(&args[0]);
                 return Ok(());
-            }
+            },
             _ => {}
         }
     }

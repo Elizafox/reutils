@@ -33,13 +33,10 @@ fn days_in_month(month: u8, year: u64) -> u8 {
 
     assert!(month > 0 && month <= 12);
 
-    let month = month - 1;
     if is_leap_year(year) {
-        #[allow(clippy::cast_possible_truncation)]
-        DAYS_IN_MONTH[1][month as usize]
+        DAYS_IN_MONTH[1][(month - 1) as usize]
     } else {
-        #[allow(clippy::cast_possible_truncation)]
-        DAYS_IN_MONTH[0][month as usize]
+        DAYS_IN_MONTH[0][(month - 1) as usize]
     }
 }
 
@@ -52,6 +49,8 @@ fn get_first_day_of_week(month: u8, year: u64) -> u8 {
         if month < 3 {
             year -= 1;
         }
+
+        // Safe cast
         #[allow(clippy::cast_possible_truncation)]
         ((year + year / 4 - year / 100 + year / 400 + T[(month - 1) as usize] + 1) % 7)
             .try_into()
@@ -62,6 +61,7 @@ fn get_first_day_of_week(month: u8, year: u64) -> u8 {
             month += 12;
             year -= 1;
         }
+
         ((1 + 2 * month + (3 * month + 3) / 5 + year + year / 4 + 6) % 7)
             .try_into()
             .unwrap()
@@ -70,7 +70,7 @@ fn get_first_day_of_week(month: u8, year: u64) -> u8 {
 }
 
 fn push_line(vec: &mut Vec<String>, line: &mut str, do_extra_pad: bool) {
-    // XXX we can probably eliminate this{
+    // XXX we can probably eliminate this
     let mut line = line.trim_end().to_string();
     if do_extra_pad {
         line.push_str(&" ".repeat(20 - (line.len() - 7)));
@@ -98,11 +98,11 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
     ];
 
     let now = Local::now();
-    #[allow(clippy::cast_sign_loss)]
+    #[allow(clippy::cast_sign_loss)] // Years can't be negative
     let local_year = now.year() as u64;
-    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_truncation)] // No months over 12
     let local_month = now.month() as u8;
-    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_truncation)] // No days over 31
     let local_day = now.day() as u8;
 
     let mut ret: Vec<String> = Vec::new();
@@ -124,6 +124,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
     loop {
         if year == local_year && month == local_month && current_day == local_day {
             do_extra_pad = true;
+            // ANSI invert
             line.push_str(&format!("\x1b[7m{current_day:>2}\x1b[m "));
         } else {
             line.push_str(&format!("{current_day:>2} "));
@@ -208,9 +209,9 @@ pub fn util(args: &[String]) -> Result {
         }
         1 => {
             let now = Local::now();
-            #[allow(clippy::cast_sign_loss)]
+            #[allow(clippy::cast_sign_loss)] // Negative years not allowed
             let local_year = now.year() as u64;
-            #[allow(clippy::cast_possible_truncation)]
+            #[allow(clippy::cast_possible_truncation)] // Months won't be over 12
             let local_month = now.month() as u8;
 
             print_month_calendar(local_month, local_year, true);
