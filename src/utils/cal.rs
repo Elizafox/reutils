@@ -69,7 +69,7 @@ fn get_first_day_of_week(month: u8, year: u64) -> u8 {
     day_of_week
 }
 
-fn pad_line(line: &mut str, do_extra_pad: bool) {
+fn push_line(vec: &mut Vec<String>, line: &mut str, do_extra_pad: bool) {
     // XXX we can probably eliminate this{
     let mut line = line.trim_end().to_string();
     if do_extra_pad {
@@ -77,6 +77,8 @@ fn pad_line(line: &mut str, do_extra_pad: bool) {
     } else {
         line.push_str(&" ".repeat(20 - line.len()));
     }
+
+    vec.push(line.clone());
 }
 
 fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
@@ -129,8 +131,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
 
         current_day += 1;
         if current_day > days_in_month {
-            pad_line(&mut line, do_extra_pad);
-            ret.push(line.clone());
+            push_line(&mut ret, &mut line, do_extra_pad);
             break;
         } else if year == 1752 && month == 9 && current_day == 3 {
             /* You may be wondering why this is here.
@@ -148,8 +149,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
         day_of_week += 1;
         if day_of_week > 6 {
             day_of_week = 0;
-            pad_line(&mut line, do_extra_pad);
-            ret.push(line.clone());
+            push_line(&mut ret, &mut line, do_extra_pad);
             line.clear();
         }
     }
