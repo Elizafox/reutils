@@ -115,7 +115,7 @@ pub fn perform(prefix: &str) -> Result {
         if util_path.exists() {
             println!("Skipping {util} as it is already installed");
             continue;
-        }    
+        }
 
         println!("Installing {util} => {}", util_path.to_str().unwrap());
 

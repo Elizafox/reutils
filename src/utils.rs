@@ -38,3 +38,11 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "true" => ("bin/true", true_::util),
     "tty" => ("usr/bin/tty", tty::util),
 };
+
+pub fn paths() -> Vec<(&'static str, &'static str)> {
+    let mut utils: Vec<(&'static str, &'static str)> = Vec::new();
+    for (util_name, (util_path, _)) in &DISPATCH_TABLE {
+        utils.push((util_name, util_path));
+    }
+    utils
+}

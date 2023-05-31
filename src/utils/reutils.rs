@@ -9,7 +9,7 @@ use getargs::{Opt, Options};
 
 use crate::err::{Error, Result};
 use crate::install::perform;
-use crate::utils::DISPATCH_TABLE;
+use crate::utils::{paths, DISPATCH_TABLE};
 use crate::version::about;
 
 pub fn util(args: &[String]) -> Result {
@@ -24,9 +24,17 @@ pub fn util(args: &[String]) -> Result {
         match opt {
             Opt::Short('h') | Opt::Long("help") => {
                 eprintln!(
-                    "Usage: {} [--version|-v] [--install [basedir]] [-h|--help] | [utility] ...",
+                    "Usage: {} [--version|-v] [--install [basedir]] [--list-tools] [-h|--help] | [utility] ...",
                     args[0]
                 );
+                return Ok(());
+            }
+            Opt::Long("list-tools") => {
+                eprintln!("# Note: all tool paths are relative");
+                let utils = paths();
+                for (util_name, util_path) in utils {
+                    println!("{util_name} = {util_path}");
+                }
                 return Ok(());
             }
             Opt::Short('v') | Opt::Long("version") => {
