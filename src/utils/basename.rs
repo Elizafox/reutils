@@ -14,10 +14,11 @@ fn usage(arg0: &str) -> Error {
 
 fn basename(path: &str) -> Result<String, Error> {
     Ok(match Path::new(&path).file_name() {
-        Some(base) => base.to_str()
+        Some(base) => base
+            .to_str()
             .ok_or_else(|| Error::new(1, "Could not convert path".to_string()))?
             .to_string(),
-        None => path.to_string()
+        None => path.to_string(),
     })
 }
 
