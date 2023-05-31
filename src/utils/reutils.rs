@@ -5,14 +5,39 @@
 
 use std::process::Command;
 
+use getargs::{Opt, Options};
+
 use crate::err::{Error, Result};
+use crate::install::do_install;
 use crate::utils::DISPATCH_TABLE;
 use crate::version::about;
 
 pub fn util(args: &[String]) -> Result {
     if args.len() <= 1 {
-        about(true);
+        about(false);
         return Err(Error::new_nomsg(1));
+    }
+
+    // Parse opts
+    let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
+    while let Some(opt) = opts.next_opt().expect("argument parsing error") {
+        match opt {
+            Opt::Short('h') | Opt::Long("help") => {
+                eprintln!("Usage: {} [--version|-v] [--install [basedir]] [-h|--help] | [utility] ...", args[0]);
+                return Ok(());
+            },
+            Opt::Short('v') | Opt::Long("version") => {
+                about(true);
+                return Ok(());
+            },
+            Opt::Long("install") => {
+                let prefix = opts
+                    .value()
+                    .unwrap_or("");
+                return do_install(prefix);
+            },
+            _ => {}
+        }
     }
 
     // Determine if what we're executing is a builtin

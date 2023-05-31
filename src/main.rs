@@ -12,6 +12,7 @@
 mod bufinput;
 mod bufoutput;
 mod err;
+mod install;
 mod utils;
 mod version;
 
@@ -19,6 +20,7 @@ use std::env;
 use std::path::Path;
 use std::process::exit;
 
+use crate::err::Result;
 use crate::utils::DISPATCH_TABLE;
 
 #[cfg(target_os = "windows")]
@@ -55,22 +57,26 @@ fn get_util_name(arg0: &str) -> String {
     )
 }
 
+fn do_exit(result: Result) -> ! {
+    match result {
+        Ok(_) => exit(0),
+        Err(e) => {
+            if let Some(message) = e.message {
+                eprintln!("{message}");
+            }
+
+            exit(e.code)
+        }
+    }
+}
+
 fn main() {
     let args: Vec<_> = env::args().collect();
     let util = get_util_name(&args[0]);
 
     // Attempt to find the utility
     if let Some(util_entry) = DISPATCH_TABLE.get(&util).copied() {
-        match util_entry.1(args.as_slice()) {
-            Ok(_) => exit(0),
-            Err(e) => {
-                if let Some(message) = e.message {
-                    eprintln!("{message}");
-                }
-
-                exit(e.code)
-            }
-        }
+        do_exit(util_entry.1(args.as_slice()))
     }
 
     eprintln!("{util}: utility not found");
