@@ -1,3 +1,8 @@
+/* version.rs - version information for reutils
+ * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const GIT_REVISION: &str = env!("VERGEN_GIT_DESCRIBE");
 const BUILD_TIMESTAMP: &str = env!("VERGEN_BUILD_TIMESTAMP");
