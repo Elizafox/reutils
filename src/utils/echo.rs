@@ -8,7 +8,7 @@ use crate::err::Result;
 #[allow(clippy::unnecessary_wraps)]
 pub fn util(args: &[String]) -> Result {
     if args.len() > 1 {
-        for arg in args {
+        for arg in &args[1..] {
             println!("{arg}");
         }
     } else {
