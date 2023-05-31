@@ -43,17 +43,7 @@ fn days_in_month(month: u8, year: u64) -> u8 {
 fn get_first_weekday_of_month(month: u8, year: u64) -> u8 {
     let mut month = u64::from(month);
     let mut year = year;
-    let day_of_week: u8 = if year < 1752 && month <= 9 {
-        // Julian
-        if month < 3 {
-            month += 12;
-            year -= 1;
-        }
-
-        ((1 + 2 * month + (3 * month + 3) / 5 + year + year / 4 + 6) % 7)
-            .try_into()
-            .unwrap()
-    } else {
+    let day_of_week: u8 = if year > 1752 || (year == 1752 && month > 9) {
         // Gregorian
         const T: [u64; 12] = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
         if month < 3 {
@@ -63,6 +53,16 @@ fn get_first_weekday_of_month(month: u8, year: u64) -> u8 {
         // Safe cast
         #[allow(clippy::cast_possible_truncation)]
         ((year + year / 4 - year / 100 + year / 400 + T[(month - 1) as usize] + 1) % 7)
+            .try_into()
+            .unwrap()
+    } else {
+        // Julian
+        if month < 3 {
+            month += 12;
+            year -= 1;
+        }
+
+        ((1 + 2 * month + (3 * month + 3) / 5 + year + year / 4 + 6) % 7)
             .try_into()
             .unwrap()
     };
