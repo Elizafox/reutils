@@ -41,5 +41,7 @@ phf = { version = "0.11.1", features = ["macros"] }
 filetime = "=0.2.20"
 mio = "=0.8.6"
 
+# Windows-only deps go here
 [target.'cfg(windows)'.dependencies]
 is_elevated = "0.1.2"
+symlink = "0.1.0"
