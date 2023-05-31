@@ -7,7 +7,7 @@
 #![warn(clippy::pedantic)]
 #![warn(clippy::nursery)]
 #![warn(clippy::pedantic)]
-#![warn(clippy::cargo)]
+//#![warn(clippy::cargo)] -- too many false positives
 
 mod bufinput;
 mod bufoutput;
