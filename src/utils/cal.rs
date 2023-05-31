@@ -14,12 +14,12 @@ use chrono::{Datelike, Local};
 use crate::err::{Error, Result};
 
 const fn is_leap_year(year: u64) -> bool {
-    if year <= 1752 {
-        // Julian
-        (year % 4) == 0
-    } else {
+    if year > 1752 {
         // Gregorian
         !(((year % 4) > 0 && (year % 100) > 0) || ((year % 400) == 0))
+    } else {
+        // Julian
+        (year % 4) == 0
     }
 }
 
