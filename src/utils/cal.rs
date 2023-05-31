@@ -119,6 +119,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
 
         current_day += 1;
         if current_day > days_in_month {
+            // XXX
             line = line.trim_end().to_string();
             if do_extra_pad {
                 line.push_str(&" ".repeat(20 - (line.len() - 7)));
@@ -128,13 +129,22 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
             ret.push(line.clone());
             break;
         } else if year == 1752 && month == 9 && current_day == 3 {
-            // Funky shenanigans
-            current_day += 13;
+            /* You may be wondering why this is here.
+             * Per POSIX, the transition to the Gregorian calendar should be treated as if it
+             * happened on 14 September, 1752. That's when the British Empire adopted the Gregorian
+             * calendar empire-wide. The actual implementation was to drop all days 3 thru 13
+             * inclusive.
+             *
+             * If you want to know more:
+             *   https://en.wikipedia.org/wiki/Calendar_(New_Style)_Act_1750
+             */
+             current_day += 13;
         }
 
         day_of_week += 1;
         if day_of_week > 6 {
             day_of_week = 0;
+            // XXX
             line = line.trim_end().to_string();
             if do_extra_pad {
                 do_extra_pad = false;
