@@ -38,9 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         split_authors(env!("CARGO_PKG_AUTHORS"))
     );
 
-    let hostname = gethostname()
-        .into_string()
-        .unwrap_or("unknown".to_string());
+    let hostname = gethostname().into_string().unwrap_or("unknown".to_string());
     println!("cargo:rustc-env=REUTILS_BUILD_HOST={}", hostname);
 
     Ok(())

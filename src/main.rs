@@ -28,19 +28,19 @@ fn get_util_name(arg0: &str) -> String {
     if &arg0[arg0.len() - 3..] == "exe" {
         // If the file ends in .exe, strip it off.
         return Path::new(&arg0)
-                .file_stem()
-                .expect("Failed to get path name!")
-                .to_str()
-                .expect("Failed to get path name!")
-                .to_string();
+            .file_stem()
+            .expect("Failed to get path name!")
+            .to_str()
+            .expect("Failed to get path name!")
+            .to_string();
     } else {
         // Use the usual implementation
         return Path::new(&arg0)
-                .file_name()
-                .expect("Failed to get path name!")
-                .to_str()
-                .expect("Failed to get path name!")
-                .to_string();
+            .file_name()
+            .expect("Failed to get path name!")
+            .to_str()
+            .expect("Failed to get path name!")
+            .to_string();
     }
 }
 
