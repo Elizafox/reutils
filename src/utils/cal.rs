@@ -138,7 +138,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
              * If you want to know more:
              *   https://en.wikipedia.org/wiki/Calendar_(New_Style)_Act_1750
              */
-             current_day += 13;
+            current_day += 13;
         }
 
         day_of_week += 1;
