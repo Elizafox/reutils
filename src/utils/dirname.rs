@@ -14,11 +14,10 @@ fn usage(arg0: &str) -> Error {
 
 fn dirname(path: &str) -> Result<String, Error> {
     Ok(match Path::new(&path).parent() {
-        Some(base) => String::from(
-            base.to_str()
-                .ok_or_else(|| Error::new(1, "Could not convert path".to_string()))?,
-        ),
-        None => String::from(path),
+        Some(base) => base.to_str()
+            .ok_or_else(|| Error::new(1, "Could not convert path".to_string()))?
+            .to_string(),
+        None => path.to_string(),
     })
 }
 

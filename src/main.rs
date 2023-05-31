@@ -27,34 +27,31 @@ use crate::utils::DISPATCH_TABLE;
 fn get_util_name(arg0: &str) -> String {
     if &arg0[arg0.len() - 3..] == "exe" {
         // If the file ends in .exe, strip it off.
-        return String::from(
-            Path::new(&arg0)
+        return Path::new(&arg0)
                 .file_stem()
                 .expect("Failed to get path name!")
                 .to_str()
-                .expect("Failed to get path name!"),
-        );
+                .expect("Failed to get path name!")
+                .to_string();
     } else {
         // Use the usual implementation
-        return String::from(
-            Path::new(&arg0)
+        return Path::new(&arg0)
                 .file_name()
                 .expect("Failed to get path name!")
                 .to_str()
-                .expect("Failed to get path name!"),
-        );
+                .expect("Failed to get path name!")
+                .to_string();
     }
 }
 
 #[cfg(not(target_os = "windows"))]
 fn get_util_name(arg0: &str) -> String {
-    String::from(
-        Path::new(&arg0)
-            .file_name()
-            .expect("Failed to get path name!")
-            .to_str()
-            .expect("Failed to get path name!"),
-    )
+    Path::new(&arg0)
+        .file_name()
+        .expect("Failed to get path name!")
+        .to_str()
+        .expect("Failed to get path name!")
+        .to_string()
 }
 
 fn do_exit(result: Result) -> ! {
