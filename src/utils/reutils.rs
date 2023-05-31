@@ -23,19 +23,20 @@ pub fn util(args: &[String]) -> Result {
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
             Opt::Short('h') | Opt::Long("help") => {
-                eprintln!("Usage: {} [--version|-v] [--install [basedir]] [-h|--help] | [utility] ...", args[0]);
+                eprintln!(
+                    "Usage: {} [--version|-v] [--install [basedir]] [-h|--help] | [utility] ...",
+                    args[0]
+                );
                 return Ok(());
-            },
+            }
             Opt::Short('v') | Opt::Long("version") => {
                 about(true);
                 return Ok(());
-            },
+            }
             Opt::Long("install") => {
-                let prefix = opts
-                    .value()
-                    .unwrap_or("");
+                let prefix = opts.value().unwrap_or("");
                 return do_install(prefix);
-            },
+            }
             _ => {}
         }
     }

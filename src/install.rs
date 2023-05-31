@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::env::{args_os, current_exe, {consts::EXE_SUFFIX}};
-use std::fs::{canonicalize, create_dir_all, copy};
+use std::env::{args_os, consts::EXE_SUFFIX, current_exe};
+use std::fs::{canonicalize, copy, create_dir_all};
 use std::path::{Path, PathBuf};
 
 use crate::err::{Error, Result};
@@ -18,13 +18,13 @@ enum ExitCode {
     SymlinkFailure = 4,
     CopyFailure = 5,
     #[cfg(windows)]
-    PrivilegeFailure = 6,  // Windows only for now, reserved for Unix
+    PrivilegeFailure = 6, // Windows only for now, reserved for Unix
 }
 
 #[cfg(unix)]
 const DEFAULT_PREFIX: &'static str = "/";
 #[cfg(windows)]
-const DEFAULT_PREFIX: &'static str = "C:\\Program Files\\reutils";  // XXX
+const DEFAULT_PREFIX: &'static str = "C:\\Program Files\\reutils"; // XXX
 
 #[cfg(unix)]
 fn create_file_symlink<P: AsRef<Path>, Q: AsRef<Path>>(p: &P, q: &Q) -> std::io::Result<()> {
@@ -42,7 +42,9 @@ fn create_file_symlink<P: AsRef<Path>, Q: AsRef<Path>>(p: &P, q: &Q) -> std::io:
 
 fn current_exe_path() -> PathBuf {
     let arg0 = args_os().next().expect("Could not get arg0");
-    let name = Path::new(&arg0).file_name().expect("Could not get binary name");
+    let name = Path::new(&arg0)
+        .file_name()
+        .expect("Could not get binary name");
     let mut path = current_exe().expect("Could not get exe path");
     path.pop();
     if path.ends_with("deps") {
@@ -61,16 +63,15 @@ pub fn do_install(prefix: &str) -> Result {
         Path::new(prefix)
     };
 
-    let reutils_exe_base_path = DISPATCH_TABLE
-        .get("reutils")
-        .copied()
-        .unwrap()
-        .0;
+    let reutils_exe_base_path = DISPATCH_TABLE.get("reutils").copied().unwrap().0;
     let reutils_exe_path = prefix.join(reutils_exe_base_path);
 
     #[cfg(windows)]
     if !is_elevated::is_elevated() {
-        Err(Error::new(ExitCode::PrivilegeFailure as i32, "Admin privileges are required on Windows to install"))
+        Err(Error::new(
+            ExitCode::PrivilegeFailure as i32,
+            "Admin privileges are required on Windows to install",
+        ))
     }
 
     println!("Starting installation");
@@ -78,21 +79,34 @@ pub fn do_install(prefix: &str) -> Result {
     // Install the binary if we must
     let current_exe_path = current_exe_path();
     if current_exe_path == reutils_exe_path {
-        println!("reutils binary located at {}", reutils_exe_path.to_string_lossy());
+        println!(
+            "reutils binary located at {}",
+            reutils_exe_path.to_string_lossy()
+        );
     } else {
-        println!("Copying reutils binary from {} => {}",
+        println!(
+            "Copying reutils binary from {} => {}",
             current_exe_path.to_string_lossy(),
-            reutils_exe_path.to_string_lossy());
+            reutils_exe_path.to_string_lossy()
+        );
 
         let parent = reutils_exe_path.parent().unwrap();
         if !parent.exists() {
             println!("Creating prefix directory {}", parent.to_str().unwrap());
-            create_dir_all(parent)
-                .map_err(|e| Error::new(ExitCode::CreateDirFailure as i32, format!("Could not create prefix directory: {e}")))?;
+            create_dir_all(parent).map_err(|e| {
+                Error::new(
+                    ExitCode::CreateDirFailure as i32,
+                    format!("Could not create prefix directory: {e}"),
+                )
+            })?;
         }
 
-        copy(&current_exe_path, &reutils_exe_path)
-            .map_err(|e| Error::new(ExitCode::CopyFailure as i32, format!("Could not copy reutils binary: {e}")))?;
+        copy(&current_exe_path, &reutils_exe_path).map_err(|e| {
+            Error::new(
+                ExitCode::CopyFailure as i32,
+                format!("Could not copy reutils binary: {e}"),
+            )
+        })?;
     }
 
     // Install the utilities
@@ -108,12 +122,20 @@ pub fn do_install(prefix: &str) -> Result {
         let parent = util_path.parent().unwrap();
         if !parent.exists() {
             println!("Creating directory {}", parent.to_str().unwrap());
-            create_dir_all(parent)
-                .map_err(|e| Error::new(ExitCode::CreateDirFailure as i32, format!("Directory could not be created: {e}")))?;
+            create_dir_all(parent).map_err(|e| {
+                Error::new(
+                    ExitCode::CreateDirFailure as i32,
+                    format!("Directory could not be created: {e}"),
+                )
+            })?;
         }
 
-        create_file_symlink(&reutils_exe_path, &util_path)
-            .map_err(|e| Error::new(ExitCode::SymlinkFailure as i32, format!("Could not create symlink: {e}")))?;
+        create_file_symlink(&reutils_exe_path, &util_path).map_err(|e| {
+            Error::new(
+                ExitCode::SymlinkFailure as i32,
+                format!("Could not create symlink: {e}"),
+            )
+        })?;
     }
 
     Ok(())
