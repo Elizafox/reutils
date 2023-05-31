@@ -27,12 +27,17 @@ fn ttyname() -> Result<String> {
         .to_str()
         .map_err(|e| Error::new(1, format!("Could not get TTY name: {e}")))?;
 
-    Ok(String::from(name))
+    Ok(name.to_string())
 }
 
 #[cfg(windows)]
 fn ttyname() -> Result<String> {
-    return Err(Error::new(255, "Not implemented".to_string()));
+    /* FIXME - MingW does emulate a pty device... but we can't rely on it.
+     * Windows does have some PTY stuff in modern versions, but, idk if we can use it?
+     * Hard to say.
+     * --Elizafox
+     */
+    Err(Error::new(255, "Not implemented on Windows".to_string()))
 }
 
 pub fn util(_args: &[String]) -> Result {
