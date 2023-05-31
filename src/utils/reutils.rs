@@ -8,7 +8,7 @@ use std::process::Command;
 use getargs::{Opt, Options};
 
 use crate::err::{Error, Result};
-use crate::install::do_install;
+use crate::install::perform;
 use crate::utils::DISPATCH_TABLE;
 use crate::version::about;
 
@@ -35,7 +35,7 @@ pub fn util(args: &[String]) -> Result {
             }
             Opt::Long("install") => {
                 let prefix = opts.value().unwrap_or("");
-                return do_install(prefix);
+                return perform(prefix);
             }
             _ => {}
         }

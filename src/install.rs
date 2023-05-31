@@ -11,20 +11,20 @@ use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
 
 #[derive(Copy, Clone)]
-enum ExitCode {
-    //UnknownFailure = 1,  // Reserved
-    //InvalidArgumentFailure = 2,  // Reserved
-    CreateDirFailure = 3,
-    SymlinkFailure = 4,
-    CopyFailure = 5,
+enum ErrorCode {
+    //Unknown = 1,  // Reserved
+    //InvalidArgument = 2,  // Reserved
+    CreateDir = 3,
+    Symlink = 4,
+    Copy = 5,
     #[cfg(windows)]
-    PrivilegeFailure = 6, // Windows only for now, reserved for Unix
+    Privilege = 6, // Windows only for now, reserved for Unix
 }
 
 #[cfg(unix)]
-const DEFAULT_PREFIX: &'static str = "/";
+const DEFAULT_PREFIX: &str = "/";
 #[cfg(windows)]
-const DEFAULT_PREFIX: &'static str = "C:\\Program Files\\reutils"; // XXX
+const DEFAULT_PREFIX: &str = "C:\\Program Files\\reutils"; // XXX
 
 #[cfg(unix)]
 fn create_file_symlink<P: AsRef<Path>, Q: AsRef<Path>>(p: &P, q: &Q) -> std::io::Result<()> {
@@ -56,8 +56,8 @@ fn current_exe_path() -> PathBuf {
     canonicalize(&path).unwrap_or(path)
 }
 
-pub fn do_install(prefix: &str) -> Result {
-    let prefix = if prefix == "" {
+pub fn perform(prefix: &str) -> Result {
+    let prefix = if prefix.is_empty() {
         Path::new(DEFAULT_PREFIX)
     } else {
         Path::new(prefix)
@@ -69,7 +69,7 @@ pub fn do_install(prefix: &str) -> Result {
     #[cfg(windows)]
     if !is_elevated::is_elevated() {
         Err(Error::new(
-            ExitCode::PrivilegeFailure as i32,
+            ErrorCode::Privilege as i32,
             "Admin privileges are required on Windows to install",
         ))
     }
@@ -95,7 +95,7 @@ pub fn do_install(prefix: &str) -> Result {
             println!("Creating prefix directory {}", parent.to_str().unwrap());
             create_dir_all(parent).map_err(|e| {
                 Error::new(
-                    ExitCode::CreateDirFailure as i32,
+                    ErrorCode::CreateDir as i32,
                     format!("Could not create prefix directory: {e}"),
                 )
             })?;
@@ -103,7 +103,7 @@ pub fn do_install(prefix: &str) -> Result {
 
         copy(&current_exe_path, &reutils_exe_path).map_err(|e| {
             Error::new(
-                ExitCode::CopyFailure as i32,
+                ErrorCode::Copy as i32,
                 format!("Could not copy reutils binary: {e}"),
             )
         })?;
@@ -115,16 +115,16 @@ pub fn do_install(prefix: &str) -> Result {
         if util_path.exists() {
             println!("Skipping {util} as it is already installed");
             continue;
-        } else {
-            println!("Installing {util} => {}", util_path.to_str().unwrap());
-        }
+        }    
+
+        println!("Installing {util} => {}", util_path.to_str().unwrap());
 
         let parent = util_path.parent().unwrap();
         if !parent.exists() {
             println!("Creating directory {}", parent.to_str().unwrap());
             create_dir_all(parent).map_err(|e| {
                 Error::new(
-                    ExitCode::CreateDirFailure as i32,
+                    ErrorCode::CreateDir as i32,
                     format!("Directory could not be created: {e}"),
                 )
             })?;
@@ -132,7 +132,7 @@ pub fn do_install(prefix: &str) -> Result {
 
         create_file_symlink(&reutils_exe_path, &util_path).map_err(|e| {
             Error::new(
-                ExitCode::SymlinkFailure as i32,
+                ErrorCode::Symlink as i32,
                 format!("Could not create symlink: {e}"),
             )
         })?;
