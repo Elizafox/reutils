@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+use std::fmt;
+
 #[derive(Debug)]
 pub struct Error {
     pub code: i32,
@@ -23,6 +25,15 @@ impl Error {
         Self {
             code,
             message: None,
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match &self.message {
+            Some(e) => write!(f, "{e}"),
+            None => write!(f, "Error code {}", self.code),
         }
     }
 }

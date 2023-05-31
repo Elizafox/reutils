@@ -58,8 +58,8 @@ fn do_exit(result: Result) -> ! {
     match result {
         Ok(_) => exit(0),
         Err(e) => {
-            if let Some(message) = e.message {
-                eprintln!("{message}");
+            if e.message != None {
+                eprintln!("{e}");
             }
 
             exit(e.code)
