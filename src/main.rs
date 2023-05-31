@@ -33,15 +33,15 @@ fn get_util_name(arg0: &str) -> String {
             .to_str()
             .expect("Failed to get path name!")
             .to_string();
-    } else {
-        // Use the usual implementation
-        return Path::new(&arg0)
-            .file_name()
-            .expect("Failed to get path name!")
-            .to_str()
-            .expect("Failed to get path name!")
-            .to_string();
     }
+
+    // Use the usual implementation
+    return Path::new(&arg0)
+        .file_name()
+        .expect("Failed to get path name!")
+        .to_str()
+        .expect("Failed to get path name!")
+        .to_string();
 }
 
 #[cfg(not(target_os = "windows"))]

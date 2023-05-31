@@ -21,7 +21,7 @@ fn block_sigalrm() {
 }
 
 #[cfg(target_os = "windows")]
-fn block_sigalrm() {}
+const fn block_sigalrm() {}
 
 pub fn util(args: &[String]) -> Result {
     block_sigalrm(); // POSIX sez this is a valid option
