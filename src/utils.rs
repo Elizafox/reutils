@@ -1,4 +1,5 @@
 mod basename;
+mod cal;
 mod cat;
 mod dirname;
 mod echo;
@@ -24,6 +25,7 @@ type MapValue = (&'static str, DispatchFn);
 */
 pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! {
     "basename" => ("/usr/bin/basename", basename::util),
+    "cal" => ("/usr/bin/cal", cal::util),
     "cat" => ("/bin/cat", cat::util),
     "dirname" => ("/usr/bin/dirname", dirname::util),
     "echo" => ("/bin/echo", echo::util),
