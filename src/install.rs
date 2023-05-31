@@ -68,10 +68,10 @@ pub fn perform(prefix: &str) -> Result {
 
     #[cfg(windows)]
     if !is_elevated::is_elevated() {
-        Err(Error::new(
+        return Err(Error::new(
             ErrorCode::Privilege as i32,
-            "Admin privileges are required on Windows to install",
-        ))
+            "Admin privileges are required on Windows to install".to_string(),
+        ));
     }
 
     println!("Starting installation");
