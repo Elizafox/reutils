@@ -40,10 +40,20 @@ fn days_in_month(month: u8, year: u64) -> u8 {
     }
 }
 
-fn get_first_day_of_week(month: u8, year: u64) -> u8 {
+fn get_first_weekday_of_month(month: u8, year: u64) -> u8 {
     let mut month = u64::from(month);
     let mut year = year;
-    let day_of_week: u8 = if year > 1752 {
+    let day_of_week: u8 = if year < 1752 && month <= 9 {
+        // Julian
+        if month < 3 {
+            month += 12;
+            year -= 1;
+        }
+
+        ((1 + 2 * month + (3 * month + 3) / 5 + year + year / 4 + 6) % 7)
+            .try_into()
+            .unwrap()
+    } else {
         // Gregorian
         const T: [u64; 12] = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
         if month < 3 {
@@ -55,17 +65,8 @@ fn get_first_day_of_week(month: u8, year: u64) -> u8 {
         ((year + year / 4 - year / 100 + year / 400 + T[(month - 1) as usize] + 1) % 7)
             .try_into()
             .unwrap()
-    } else {
-        // Julian
-        if month < 3 {
-            month += 12;
-            year -= 1;
-        }
-
-        ((1 + 2 * month + (3 * month + 3) / 5 + year + year / 4 + 6) % 7)
-            .try_into()
-            .unwrap()
     };
+
     day_of_week
 }
 
@@ -108,7 +109,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
     let mut ret: Vec<String> = Vec::new();
     let days_in_month = days_in_month(month, year);
     let mut current_day = 1u8;
-    let mut day_of_week = get_first_day_of_week(month, year);
+    let mut day_of_week = get_first_weekday_of_month(month, year);
     let month_name = MONTHS[(month - 1) as usize];
 
     if print_year {
@@ -144,7 +145,7 @@ fn vec_month_calendar(month: u8, year: u64, print_year: bool) -> Vec<String> {
              * If you want to know more:
              *   https://en.wikipedia.org/wiki/Calendar_(New_Style)_Act_1750
              */
-            current_day += 13;
+            current_day += 11;
         }
 
         day_of_week += 1;
