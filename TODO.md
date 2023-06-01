@@ -95,7 +95,7 @@ Utilities
 [ ] pr
 [ ] printf
 [ ] ps
-[ ] pwd
+[x] pwd
 [ ] read
 [ ] renice
 [ ] rm
