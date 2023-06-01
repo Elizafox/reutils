@@ -62,7 +62,7 @@ fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
 }
 
 #[cfg(windows)]
-fn spawn_process(niceness: i32, command: &str, args: &[String]) -> Result {
+fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
     use std::os::windows::process::CommandExt;
     use std::process::Command;
     use windows::Win32::System::Threading::{
