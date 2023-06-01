@@ -32,6 +32,7 @@ gethostname = "0.4.3"
 
 [dependencies]
 chrono = { version = "0.4.26", default-features = false, features = ["std", "clock"] }
+errno = "0.3.1"
 getargs = "0.5.0"
 libc = { version = "0.2.144", features = ["const-extern-fn"] }
 notify = { version = "6.0.0", default-features = false, features = ["macos_kqueue"] }
@@ -45,3 +46,13 @@ mio = "=0.8.6"
 [target.'cfg(windows)'.dependencies]
 is_elevated = "0.1.2"
 symlink = "0.1.0"
+
+[dependencies.windows]
+version = "0.48"
+features = [
+    "Data_Xml_Dom",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+]
