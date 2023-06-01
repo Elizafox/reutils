@@ -15,6 +15,7 @@ use windows::Win32::Storage::FileSystem::{
     VS_FIXEDFILEINFO,
 };
 use windows::Win32::System::Diagnostics::Debug;
+use windows::Win32::System::SystemServices;
 use windows::Win32::System::SystemInformation::{
     ComputerNamePhysicalDnsFullyQualified, GetComputerNameExW, GetNativeSystemInfo, SYSTEM_INFO,
 };
@@ -166,13 +167,27 @@ pub fn architecture() -> String {
         GetNativeSystemInfo(&mut system_info);
     }
 
-    let processor_arch = unsafe { system_info.Anonymous.Anonymous.wProcessorArchitecture };
-    match processor_arch {
-        Debug::PROCESSOR_ARCHITECTURE_AMD64 => "amd64".to_string(),
-        Debug::PROCESSOR_ARCHITECTURE_ARM => "arm".to_string(),
-        //Debug::PROCESSOR_ARCHITECTURE_ARM64 => "arm64".to_string(),
-        Debug::PROCESSOR_ARCHITECTURE_IA64 => "ia64".to_string(),
-        Debug::PROCESSOR_ARCHITECTURE_INTEL => "x86".to_string(),
-        _ => "unknown".to_string(),
-    }
+    // Microsoft totally fucked up their bindings so we have to do this insanity. --Elizafox
+    let processor_arch: u32 = unsafe { system_info.Anonymous.Anonymous.wProcessorArchitecture.0 }.into();
+    
+
+    if processor_arch == Debug::PROCESSOR_ARCHITECTURE_AMD64.0.into() {
+        "amd64"
+    } else if processor_arch == Debug::PROCESSOR_ARCHITECTURE_ARM.0.into() {
+        "arm"
+    } else if processor_arch == Debug::PROCESSOR_ARCHITECTURE_IA64.0.into() {
+        "ia64"
+    } else if processor_arch == Debug::PROCESSOR_ARCHITECTURE_INTEL.0.into() {
+        "x86"
+    } else if processor_arch == SystemServices::PROCESSOR_ARCHITECTURE_ARM64 {
+        "arm64"
+    } else if processor_arch == SystemServices::PROCESSOR_ARCHITECTURE_IA32_ON_ARM64 {
+        "x86-on-arm64"
+    } else if processor_arch == SystemServices::PROCESSOR_ARCHITECTURE_IA32_ON_WIN64 {
+        "x86-on-win64"
+    } else if processor_arch == SystemServices::PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64 {
+        "arm-on-win64"
+    } else {
+        "unknown"
+    }.to_string()
 }
