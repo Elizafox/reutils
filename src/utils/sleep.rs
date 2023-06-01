@@ -20,6 +20,7 @@ fn block_sigalrm() {
     }
 }
 
+// No-op
 #[cfg(target_os = "windows")]
 const fn block_sigalrm() {}
 
