@@ -52,16 +52,13 @@ fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
     let status = cmd
         .wait()
         .map_err(|e| Error::new(1, format!("Command not running: {e}")))?;
-    match status.code() {
-        Some(code) => {
-            if code == 0 {
-                Ok(())
-            } else {
-                Err(Error::new_nomsg(code))
-            }
+    status.code().map_or(Ok(()), |code| {
+        if code == 0 {
+            Ok(())
+        } else {
+            Err(Error::new_nomsg(code))
         }
-        None => Ok(()),
-    }
+    })
 }
 
 #[cfg(windows)]
