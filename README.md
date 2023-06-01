@@ -37,6 +37,8 @@ Please ensure that your code at least doesn't break a tier 1 platform, and prefe
 
 Note that the binary size is intended to be as small as possible; therefore, try to minimise the amount of bloat. Ensure all new dependencies are small and compact. Try to keep the `release` binary size below 2-4MB.
 
+Make sure to run `cargo fmt` and `cargo clippy` before submitting pull requests!
+
 TODO
 ====
 - [ ] Implement whatever utilities busybox does (including a shell, etc)
