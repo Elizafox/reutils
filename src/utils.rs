@@ -5,7 +5,7 @@ mod dirname;
 mod echo;
 mod false_;
 mod head;
-mod ln;
+mod ln_link;
 mod nice;
 mod pwd;
 mod reutils;
@@ -35,8 +35,8 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "echo" => ("bin/echo", echo::util),
     "false" => ("bin/false", false_::util),
     "head" => ("usr/bin/head", head::util),
-    "link" => ("bin/link", ln::util_link),
-    "ln" => ("bin/ln", ln::util_ln),
+    "link" => ("bin/link", ln_link::util_link),
+    "ln" => ("bin/ln", ln_link::util_ln),
     "nice" => ("usr/bin/nice", nice::util),
     "pwd" => ("bin/pwd", pwd::util),
     "reutils" => ("usr/sbin/reutils", reutils::util),

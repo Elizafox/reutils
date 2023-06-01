@@ -1,4 +1,4 @@
-/* utils/ln.rs - implementation of ln
+/* utils/ln_link.rs - implementation of ln and link
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
  * SPDX-License-Identifier: GPL-2.0-only
  */
