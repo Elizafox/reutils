@@ -15,12 +15,14 @@ Portability
 We aim to support the following platforms:
 
 Tier 1:
-- Linux
+- Linux musl
+- Linux glibc
 - Windows
 
 Tier 2:
 - macOS
 - BSD's
+- Linux uClibc
 
 Tier 3:
 - Any other Unix workalike
