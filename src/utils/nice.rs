@@ -82,13 +82,13 @@ fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
     let priority = {
         if niceness <= -20 {
             REALTIME_PRIORITY_CLASS.0
-        } else if niceness >= -19 && niceness <= -10 {
+        } else if (-19..=-10).contains(&niceness) {
             HIGH_PRIORITY_CLASS.0
-        } else if niceness <= -1 && niceness >= -9 {
+        } else if (-9..=-1).contains(&niceness) {
             ABOVE_NORMAL_PRIORITY_CLASS.0
         } else if niceness == 0 {
             NORMAL_PRIORITY_CLASS.0
-        } else if niceness >= 1 && niceness <= 18 {
+        } else if (1..=18).contains(&niceness) {
             BELOW_NORMAL_PRIORITY_CLASS.0
         } else if niceness >= 19 {
             IDLE_PRIORITY_CLASS.0
@@ -107,16 +107,13 @@ fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
     let status = cmd
         .wait()
         .map_err(|e| Error::new(1, format!("Command not running: {e}")))?;
-    match status.code() {
-        Some(code) => {
-            if code == 0 {
-                Ok(())
-            } else {
-                Err(Error::new_nomsg(code))
-            }
+    status.code().map_or(Ok(()), |code| {
+        if code == 0 {
+            Ok(())
+        } else {
+            Err(Error::new_nomsg(code))
         }
-        None => Ok(()),
-    }
+    })
 }
 
 fn usage(arg0: &str) -> Error {
