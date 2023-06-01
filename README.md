@@ -1,6 +1,6 @@
 reutils
 -------
-This is reutils, a clone of busybox in Rust.
+This is reutils, a clone of busybox in Rust, specifically aimed at containers and small embedded systems.
 
 Some utilities are implemented, but it's not a complete system; notably, there is no shell yet.
 
