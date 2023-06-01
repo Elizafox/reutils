@@ -41,8 +41,4 @@ Make sure to run `cargo fmt` and `cargo clippy` before submitting pull requests!
 
 TODO
 ====
-- [ ] Implement whatever utilities busybox does (including a shell, etc)
-- [ ] Proper version support (build script?)
-- [ ] We could probably handle errors better, in a more Rust-like way
-- [ ] `--install` flag
-- [ ] Way to list the path of all utilities
+See the [TODO](./TODO.md) file.
