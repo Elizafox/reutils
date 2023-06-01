@@ -4,14 +4,15 @@
  */
 
 use std::env;
-use std::fs::metadata;
 use std::io;
 
 use getargs::{Opt, Options};
 
 use crate::err::Result;
 
+#[cfg(unix)]
 fn getcwd_logical() -> io::Result<String> {
+    use std::fs::metadata;
     use std::os::unix::fs::MetadataExt;
 
     let pwd = env::var("PWD")
@@ -26,6 +27,14 @@ fn getcwd_logical() -> io::Result<String> {
     }
 
     Err(io::Error::from(io::ErrorKind::InvalidData))
+}
+
+#[cfg(windows)]
+fn getcwd_logical() -> io::Result<String> {
+    // Might be set by MingW
+    let pwd = env::var("PWD")
+        .map_err(|_| io::Error::new(io::ErrorKind::Other, "Could not get PWD env var"))?;
+    Ok(pwd.to_string())
 }
 
 pub fn util(args: &[String]) -> Result {
