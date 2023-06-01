@@ -13,6 +13,7 @@ mod bufinput;
 mod bufoutput;
 mod err;
 mod install;
+mod platform;
 mod utils;
 mod version;
 
