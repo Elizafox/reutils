@@ -10,11 +10,22 @@ use std::os::windows::ffi::OsStringExt;
 use std::ptr;
 
 use windows::core::{HSTRING, PWSTR};
-use windows::Win32::Storage::FileSystem::{FILE_VER_GET_NEUTRAL, GetFileVersionInfoExW, GetFileVersionInfoSizeExW, VS_FIXEDFILEINFO, VerQueryValueW};
+use windows::Win32::Storage::FileSystem::{
+    GetFileVersionInfoExW, GetFileVersionInfoSizeExW, VerQueryValueW, FILE_VER_GET_NEUTRAL,
+    VS_FIXEDFILEINFO,
+};
 use windows::Win32::System::Diagnostics::Debug;
-use windows::Win32::System::SystemInformation::{ComputerNamePhysicalDnsFullyQualified, GetComputerNameExW, GetNativeSystemInfo, SYSTEM_INFO};
+use windows::Win32::System::SystemInformation::{
+    ComputerNamePhysicalDnsFullyQualified, GetComputerNameExW, GetNativeSystemInfo, SYSTEM_INFO,
+};
 
-use crate::platform::windows::hostinfo::version::{is_windows_10_or_greater, is_windows_11_or_greater, is_windows_7_or_greater, is_windows_7_sp1_or_greater, is_windows_8_or_greater, is_windows_8_point_1_or_greater, is_windows_server, is_windows_threshold_or_greater, is_windows_vista_or_greater, is_windows_vista_sp1_or_greater, is_windows_vista_sp2_or_greater, is_windows_xp_or_greater, is_windows_xp_sp1_or_greater, is_windows_xp_sp2_or_greater, is_windows_xp_sp3_or_greater};
+use crate::platform::windows::hostinfo::version::{
+    is_windows_10_or_greater, is_windows_11_or_greater, is_windows_7_or_greater,
+    is_windows_7_sp1_or_greater, is_windows_8_or_greater, is_windows_8_point_1_or_greater,
+    is_windows_server, is_windows_threshold_or_greater, is_windows_vista_or_greater,
+    is_windows_vista_sp1_or_greater, is_windows_vista_sp2_or_greater, is_windows_xp_or_greater,
+    is_windows_xp_sp1_or_greater, is_windows_xp_sp2_or_greater, is_windows_xp_sp3_or_greater,
+};
 
 pub fn hostname() -> String {
     let mut buflen: u32 = 0;
@@ -29,7 +40,10 @@ pub fn hostname() -> String {
     };
 
     // Something has gone terribly wrong!
-assert!(buflen != 0, "GetComputerNameExW did not provide buffer size");
+    assert!(
+        buflen != 0,
+        "GetComputerNameExW did not provide buffer size"
+    );
 
     let mut buffer = vec![0_u16; buflen as usize];
     if unsafe {
@@ -43,7 +57,10 @@ assert!(buflen != 0, "GetComputerNameExW did not provide buffer size");
         panic!("GetComputerNameExW could not read hostname");
     }
 
-    assert!((buflen as usize) == (buffer.len() - 1), "GetComputerNameExW changed the buffer size unexpectedly");
+    assert!(
+        (buflen as usize) == (buffer.len() - 1),
+        "GetComputerNameExW changed the buffer size unexpectedly"
+    );
 
     let end = buffer.iter().position(|&b| b == 0).unwrap_or(buffer.len());
     OsString::from_wide(&buffer[0..end]).into_string().unwrap()
@@ -52,6 +69,7 @@ assert!(buflen != 0, "GetComputerNameExW did not provide buffer size");
 /* Windows doesn't provide a good API for getting the version on modern Windows
  * This is the best we can do.
  */
+#[allow(clippy::cast_possible_truncation)]
 pub fn release() -> String {
     let filename = HSTRING::from("kernel32.dll");
     let mut dummy = 0u32;
@@ -147,7 +165,7 @@ pub fn version() -> String {
 }
 
 pub fn architecture() -> String {
-    let mut system_info: SYSTEM_INFO = Default::default();
+    let mut system_info: SYSTEM_INFO = SYSTEM_INFO::default();
 
     unsafe {
         GetNativeSystemInfo(&mut system_info);
