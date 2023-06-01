@@ -57,11 +57,6 @@ pub fn hostname() -> String {
         panic!("GetComputerNameExW could not read hostname");
     }
 
-    assert!(
-        (buflen as usize) == (buffer.len() - 1),
-        "GetComputerNameExW changed the buffer size unexpectedly"
-    );
-
     let end = buffer.iter().position(|&b| b == 0).unwrap_or(buffer.len());
     OsString::from_wide(&buffer[0..end]).into_string().unwrap()
 }
