@@ -22,7 +22,7 @@ fn getcwd_logical() -> io::Result<String> {
         let physical_md = metadata(".")?;
 
         if logical_md.dev() == physical_md.dev() && logical_md.ino() == physical_md.ino() {
-            return Ok(pwd.to_string());
+            return Ok(pwd);
         }
     }
 
@@ -37,6 +37,7 @@ fn getcwd_logical() -> io::Result<String> {
     Ok(pwd.to_string())
 }
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn util(args: &[String]) -> Result {
     let mut logical: bool = true;
 
@@ -54,19 +55,17 @@ pub fn util(args: &[String]) -> Result {
     }
 
     if logical {
-        match getcwd_logical() {
-            Ok(dir) => {
-                println!("{dir}");
-                return Ok(());
-            }
-            Err(_) => {} // We will try physical
+        // If this fails we will try physical
+        if let Ok(dir) = getcwd_logical() {
+            println!("{dir}");
+            return Ok(());
         }
     }
 
-    match env::current_dir() {
-        Ok(dir) => println!("{}", dir.to_str().unwrap_or(".")),
-        Err(_) => println!("."),
-    }
+    env::current_dir().map_or_else(
+        |_| println!("."),
+        |dir| println!("{}", dir.to_str().unwrap_or(".")),
+    );
 
     Ok(())
 }
