@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+use getargs::{Opt, Options};
+
 use crate::err::{Error, Result};
 
 #[cfg(unix)]
@@ -32,7 +34,7 @@ fn set_priority(niceness: i32) {
 }
 
 #[cfg(unix)]
-fn spawn_process(niceness: i32, command: &str, args: &[String]) -> Result {
+fn spawn_process(niceness: i32, command: &str, args: &[&str]) -> Result {
     use std::os::unix::process::CommandExt;
     use std::process::Command;
 
@@ -67,12 +69,9 @@ fn spawn_process(niceness: i32, command: &str, args: &[String]) -> Result {
     use std::os::windows::process::CommandExt;
     use std::process::Command;
     use windows::Win32::System::Threading::{
-        REALTIME_PRIORITY_CLASS,
-        HIGH_PRIORITY_CLASS,
-        ABOVE_NORMAL_PRIORITY_CLASS,
-        NORMAL_PRIORITY_CLASS,
-        BELOW_NORMAL_PRIORITY_CLASS,
-        IDLE_PRIORITY_CLASS};
+        ABOVE_NORMAL_PRIORITY_CLASS, BELOW_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS,
+        IDLE_PRIORITY_CLASS, NORMAL_PRIORITY_CLASS, REALTIME_PRIORITY_CLASS,
+    };
 
     /* This is somewhat arbitrary
      * We try to map windows priorities to the historical Unix range of -20 to 19:
@@ -123,6 +122,41 @@ fn spawn_process(niceness: i32, command: &str, args: &[String]) -> Result {
     }
 }
 
+fn usage(arg0: &str) -> Error {
+    Error::new(1, format!("Usage: {arg0} [-n number] command..."))
+}
+
 pub fn util(args: &[String]) -> Result {
-    spawn_process(19, &args[1], &args[2..])
+    let mut niceness = 10i32;
+
+    let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
+    while let Some(opt) = opts.next_opt().expect("argument parsing error") {
+        match opt {
+            Opt::Short('h') | Opt::Long("help") => {
+                eprintln!("{}", usage(&args[0]));
+                return Ok(());
+            }
+            Opt::Short('n') => {
+                let niceness_str = opts.value().map_err(|_| {
+                    eprintln!("Error: No niceness value specified");
+                    usage(&args[0])
+                })?;
+
+                niceness = niceness_str.parse::<i32>().map_err(|_| {
+                    eprintln!("Bad niceness value");
+                    usage(&args[0])
+                })?;
+            }
+            _ => {}
+        }
+    }
+
+    let args = opts.positionals().collect::<Vec<_>>();
+
+    if args.is_empty() {
+        eprintln!("No command specified");
+        return Err(usage(args[0]));
+    }
+
+    spawn_process(niceness, args[0], &args[1..])
 }
