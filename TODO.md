@@ -66,7 +66,7 @@ Utilities
 - [ ] jobs
 - [ ] join
 - [ ] kill
-- [ ] link
+- [x] link
 - [x] ln
 - [ ] locale
 - [ ] localedef

@@ -137,7 +137,12 @@ fn usage_ln(arg0: &str) -> Error {
     Error::new_nomsg(1)
 }
 
-pub fn util(args: &[String]) -> Result {
+fn usage_link(arg0: &str) -> Error {
+    eprintln!("Usage: {arg0} source_file target_file");
+    Error::new_nomsg(1)
+}
+
+pub fn util_ln(args: &[String]) -> Result {
     let mut link_type: LinkType = LinkType::HardlinkNormal;
     let mut force = false;
 
@@ -199,5 +204,17 @@ pub fn util(args: &[String]) -> Result {
         }
     }
 
+    Ok(())
+}
+
+// The implementation of link is significantly simpler
+pub fn util_link(args: &[String]) -> Result {
+    if args.len() < 3 {
+        return Err(usage_link(&args[0]));
+    }
+
+    let old = Path::new(&args[1]);
+    let new = Path::new(&args[2]);
+    perform_link(&old, &new, LinkType::HardlinkNormal, false)?;
     Ok(())
 }
