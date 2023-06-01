@@ -18,8 +18,8 @@
 
 use std::mem::size_of;
 
-use windows::Win32::System::SystemInformation::*;
-use windows::Win32::System::SystemServices::*;
+use windows::Win32::System::SystemInformation::{OSVERSIONINFOEXW, VER_MAJORVERSION, VER_MINORVERSION, VER_PRODUCT_TYPE, VER_SERVICEPACKMAJOR, VerSetConditionMask, VerifyVersionInfoW, _WIN32_WINNT_VISTA, _WIN32_WINNT_WIN10, _WIN32_WINNT_WIN7, _WIN32_WINNT_WIN8, _WIN32_WINNT_WINBLUE, _WIN32_WINNT_WINTHRESHOLD, _WIN32_WINNT_WINXP};
+use windows::Win32::System::SystemServices::{VER_EQUAL, VER_GREATER_EQUAL, VER_NT_WORKSTATION};
 
 fn is_windows_version_or_greater(major: u32, minor: u32, servpack: u16, buildno: u32) -> bool {
     let mut vi: OSVERSIONINFOEXW = Default::default();

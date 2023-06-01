@@ -116,7 +116,7 @@ fn uname(uargs: &args::UnameFlags) -> String {
 
 #[cfg(windows)]
 fn uname(uargs: &args::UnameFlags) -> String {
-    use crate::platform::windows::hostinfo::*;
+    use crate::platform::windows::hostinfo::{architecture, hostname, release, version};
 
     let mut ret = String::new();
 

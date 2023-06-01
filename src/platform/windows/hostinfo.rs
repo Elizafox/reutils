@@ -10,11 +10,11 @@ use std::os::windows::ffi::OsStringExt;
 use std::ptr;
 
 use windows::core::{HSTRING, PWSTR};
-use windows::Win32::Storage::FileSystem::*;
+use windows::Win32::Storage::FileSystem::{FILE_VER_GET_NEUTRAL, GetFileVersionInfoExW, GetFileVersionInfoSizeExW, VS_FIXEDFILEINFO, VerQueryValueW};
 use windows::Win32::System::Diagnostics::Debug;
-use windows::Win32::System::SystemInformation::*;
+use windows::Win32::System::SystemInformation::{ComputerNamePhysicalDnsFullyQualified, GetComputerNameExW, GetNativeSystemInfo, SYSTEM_INFO};
 
-use crate::platform::windows::hostinfo::version::*;
+use crate::platform::windows::hostinfo::version::{is_windows_10_or_greater, is_windows_11_or_greater, is_windows_7_or_greater, is_windows_7_sp1_or_greater, is_windows_8_or_greater, is_windows_8_point_1_or_greater, is_windows_server, is_windows_threshold_or_greater, is_windows_vista_or_greater, is_windows_vista_sp1_or_greater, is_windows_vista_sp2_or_greater, is_windows_xp_or_greater, is_windows_xp_sp1_or_greater, is_windows_xp_sp2_or_greater, is_windows_xp_sp3_or_greater};
 
 pub fn hostname() -> String {
     let mut buflen: u32 = 0;
@@ -28,10 +28,8 @@ pub fn hostname() -> String {
         )
     };
 
-    if buflen == 0 {
-        // Something has gone terribly wrong!
-        panic!("GetComputerNameExW did not provide buffer size");
-    }
+    // Something has gone terribly wrong!
+assert!(buflen != 0, "GetComputerNameExW did not provide buffer size");
 
     let mut buffer = vec![0_u16; buflen as usize];
     if unsafe {
@@ -45,9 +43,7 @@ pub fn hostname() -> String {
         panic!("GetComputerNameExW could not read hostname");
     }
 
-    if (buflen as usize) != (buffer.len() - 1) {
-        panic!("GetComputerNameExW changed the buffer size unexpectedly");
-    }
+    assert!((buflen as usize) == (buffer.len() - 1), "GetComputerNameExW changed the buffer size unexpectedly");
 
     let end = buffer.iter().position(|&b| b == 0).unwrap_or(buffer.len());
     OsString::from_wide(&buffer[0..end]).into_string().unwrap()
@@ -61,9 +57,7 @@ pub fn release() -> String {
     let mut dummy = 0u32;
 
     let cbinfo = unsafe { GetFileVersionInfoSizeExW(FILE_VER_GET_NEUTRAL, &filename, &mut dummy) };
-    if cbinfo == 0 {
-        panic!("GetFileVersionInfoSizeExW failed");
-    }
+    assert!(cbinfo != 0, "GetFileVersionInfoSizeExW failed");
 
     let mut buffer = vec![0u8; cbinfo as usize];
 
@@ -73,7 +67,7 @@ pub fn release() -> String {
             &filename,
             dummy,
             buffer.len() as u32,
-            buffer.as_mut_ptr() as *mut c_void,
+            buffer.as_mut_ptr().cast::<libc::c_void>(),
         )
     } == false
     {
@@ -85,7 +79,7 @@ pub fn release() -> String {
 
     if unsafe {
         VerQueryValueW(
-            buffer.as_mut_ptr() as *mut c_void,
+            buffer.as_mut_ptr().cast::<libc::c_void>(),
             &HSTRING::from("\\"),
             &mut p,
             &mut size,
@@ -95,17 +89,15 @@ pub fn release() -> String {
         panic!("VerQueryValueW failed");
     }
 
-    if p.is_null() {
-        panic!("VerQueryValueW returned null pointer");
-    }
+    assert!(!p.is_null(), "VerQueryValueW returned null pointer");
 
     let pfixed = unsafe { *(p as *const VS_FIXEDFILEINFO) };
     format!(
         "{}.{}.{}.{}",
-        (pfixed.dwFileVersionMS & 0xFFFF0000u32) >> 16,
-        pfixed.dwFileVersionMS & 0x0000FFFFu32,
-        (pfixed.dwFileVersionLS & 0xFFFF0000u32) >> 16,
-        pfixed.dwFileVersionLS & 0x0000FFFFu32
+        (pfixed.dwFileVersionMS & 0xFFFF_0000_u32) >> 16,
+        pfixed.dwFileVersionMS & 0x0000_FFFF_u32,
+        (pfixed.dwFileVersionLS & 0xFFFF_0000_u32) >> 16,
+        pfixed.dwFileVersionLS & 0x0000_FFFF_u32
     )
 }
 

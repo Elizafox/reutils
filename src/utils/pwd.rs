@@ -34,7 +34,7 @@ fn getcwd_logical() -> io::Result<String> {
     // Might be set by MingW
     let pwd = env::var("PWD")
         .map_err(|_| io::Error::new(io::ErrorKind::Other, "Could not get PWD env var"))?;
-    Ok(pwd.to_string())
+    Ok(pwd)
 }
 
 #[allow(clippy::unnecessary_wraps)]
