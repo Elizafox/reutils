@@ -33,6 +33,10 @@ Contributing
 ============
 Contributions are always welcome. Please read the [Code of Conduct](/CODE_OF_CONDUCT.md) before contributing.
 
+Please ensure that your code at least doesn't break a tier 1 platform, and preferably not lower tiers. If you don't know how to port something, ask one of us and we will try to assist in any way we can.
+
+Note that the binary size is intended to be as small as possible; therefore, try to minimise the amount of bloat. Ensure all new dependencies are small and compact. Try to keep the `release` binary size below 2-4MB.
+
 TODO
 ====
 - [ ] Implement whatever utilities busybox does (including a shell, etc)
