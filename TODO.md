@@ -122,7 +122,7 @@ Utilities
 - [ ] ulimit
 - [ ] umask
 - [ ] unalias
-- [ ] uname
+- [x] uname
 - [ ] uncompress
 - [ ] unexpand
 - [ ] uniq
