@@ -87,7 +87,6 @@ Utilities
 - [ ] newgrp
 - [x] nice
 - [ ] nl
-- [ ] nm
 - [ ] nohup
 - [ ] od
 - [ ] paste
