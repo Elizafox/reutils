@@ -2,7 +2,9 @@ Utilities implemented
 ---------------------
 See [the POSIX list of utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html) for a guideline of what we intend to implement. The [BusyBox list of commands](https://boxmatrix.info/wiki/BusyBox-Commands) is also a general guideline, although many utilities will likely not be implemented due to dubious usefulness.
 
-Note that SCCS utilities, compilers, `make`, most dev tools, etc. are out of the project's scope. Obsolete utilities like `uux` are also out of scope. Basically, if you can't find it on a modern Unix system, it's out of scope.
+Note that SCCS utilities, compilers, `make`, most dev tools, etc. are out of the project's scope. Obsolete utilities like `uux` are also out of scope. Basically, if you can't find it on a modern Unix system, it's out of scope. We are open to having our minds changed on certain utilities, but a good rationale (and preferably patches) will be needed.
+
+Compatibility with POSIX is the main goal, except where POSIX is ambiguous and unclear (as happens often). Some minor extensions to POSIX are offered where applicable, but don't expect this to be as fully featured as coreutils. It's aimed for small environments, after all.
 
 If you have anything you wish to add to the list, please open an issue!
 
