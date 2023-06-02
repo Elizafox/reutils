@@ -92,6 +92,8 @@ Utilities
 - [ ] patch
 - [ ] pathchk
 - [ ] pax
+- [ ] ping
+- [ ] ping6
 - [ ] pr
 - [ ] printf
 - [ ] ps
@@ -115,6 +117,8 @@ Utilities
 - [ ] touch
 - [ ] tput
 - [ ] tr
+- [ ] traceroute
+- [ ] traceroute6
 - [x] true
 - [ ] tsort
 - [x] tty
