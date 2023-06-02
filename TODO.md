@@ -6,7 +6,7 @@ Note that SCCS utilities, compilers, `make`, most dev tools, etc. are out of the
 
 Compatibility with POSIX is the main goal, except where POSIX is ambiguous and unclear (as happens often). Some minor extensions to POSIX are offered where applicable, but don't expect this to be as fully featured as coreutils. It's aimed for small environments, after all.
 
-If you have anything you wish to add to the list, please open an issue!
+If you have anything you wish to add to the list, please open an issue! Note that many of the utilities listed are actually more appropriate as shell builtins, and not utilities per se.
 
 Utilities
 =========
