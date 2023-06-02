@@ -6,7 +6,7 @@
 use std::env;
 use std::error::Error;
 
-use embed_manifest::{embed_manifest, new_manifest};
+use embed_resource;
 use gethostname::gethostname;
 
 use vergen::EmitBuilder;
@@ -43,8 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rustc-env=REUTILS_BUILD_HOST={}", hostname);
 
     if std::env::var_os("CARGO_CFG_WINDOWS").is_some() {
-        embed_manifest(new_manifest("reutils.exe.manifest"))
-            .expect("unable to embed manifest file");
+        embed_resource::compile("assets/reutils.rc", embed_resource::NONE);
     }
     println!("cargo:rerun-if-changed=build.rs");
 
