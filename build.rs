@@ -44,8 +44,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if std::env::var_os("CARGO_CFG_WINDOWS").is_some() {
         embed_resource::compile("assets/reutils.rc", embed_resource::NONE);
+        println!("cargo:rerun-if-changed=build.rs");
     }
-    println!("cargo:rerun-if-changed=build.rs");
 
     Ok(())
 }

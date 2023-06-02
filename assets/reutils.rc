@@ -1,3 +1,27 @@
 #define RT_MANIFEST 24
-1 RT_MANIFEST "manifest.xml"
-1 ICON "icon.ico"
+#pragma code_page(65001)
+1 VERSIONINFO
+FILESUBTYPE 0x0
+FILEFLAGS 0x0
+FILEOS 0x40004
+FILEVERSION 0, 1, 0, 0
+PRODUCTVERSION 0, 1, 0, 0
+FILETYPE 0x1
+FILEFLAGSMASK 0x3f
+{
+    BLOCK "StringFileInfo" {
+        BLOCK "000004b0" {
+            VALUE "ProductVersion", "0.1.0"
+            VALUE "FileDescription", "Koalas on Krack"
+            VALUE "FileVersion", "0.1.0"
+            VALUE "OriginalFilename", "reutils.exe"
+            VALUE "LegalCopyright", "Copyright © 2023"
+            VALUE "ProductName", "reutils"
+        }
+    }
+    BLOCK "VarFileInfo" {
+        VALUE "Translation", 0x0009, 0x04b0
+    }
+}
+1 ICON "assets/icon.ico"
+1 RT_MANIFEST "assets/manifest.xml"
