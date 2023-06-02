@@ -15,10 +15,10 @@ use windows::Win32::Storage::FileSystem::{
     VS_FIXEDFILEINFO,
 };
 use windows::Win32::System::Diagnostics::Debug;
-use windows::Win32::System::SystemServices;
 use windows::Win32::System::SystemInformation::{
     ComputerNamePhysicalDnsFullyQualified, GetComputerNameExW, GetNativeSystemInfo, SYSTEM_INFO,
 };
+use windows::Win32::System::SystemServices;
 
 use crate::platform::windows::hostinfo::version::{
     is_windows_10_or_greater, is_windows_11_or_greater, is_windows_7_or_greater,
@@ -81,7 +81,7 @@ pub fn release() -> String {
             &filename,
             dummy,
             buffer.len() as u32,
-            buffer.as_mut_ptr().cast::<libc::c_void>(),
+            buffer.as_mut_ptr().cast::<c_void>(),
         )
     } == false
     {
@@ -93,7 +93,7 @@ pub fn release() -> String {
 
     if unsafe {
         VerQueryValueW(
-            buffer.as_mut_ptr().cast::<libc::c_void>(),
+            buffer.as_mut_ptr().cast::<c_void>(),
             &HSTRING::from("\\"),
             &mut p,
             &mut size,
@@ -168,8 +168,8 @@ pub fn architecture() -> String {
     }
 
     // Microsoft totally fucked up their bindings so we have to do this insanity. --Elizafox
-    let processor_arch: u32 = unsafe { system_info.Anonymous.Anonymous.wProcessorArchitecture.0 }.into();
-    
+    let processor_arch: u32 =
+        unsafe { system_info.Anonymous.Anonymous.wProcessorArchitecture.0 }.into();
 
     if processor_arch == Debug::PROCESSOR_ARCHITECTURE_AMD64.0.into() {
         "amd64"
@@ -189,5 +189,6 @@ pub fn architecture() -> String {
         "arm-on-win64"
     } else {
         "unknown"
-    }.to_string()
+    }
+    .to_string()
 }

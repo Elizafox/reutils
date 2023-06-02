@@ -10,13 +10,12 @@ use getargs::{Opt, Options};
 
 use crate::bufoutput::BufOutput;
 use crate::err::{Error, Result};
+use crate::platform::signal::block_ctrlc;
 
 const BUFFSIZE: usize = 16384usize;
 
 fn block_sigint() {
-    unsafe {
-        libc::signal(libc::SIGINT, libc::SIG_IGN);
-    }
+    block_ctrlc();
 }
 
 fn usage(arg0: &str) {
