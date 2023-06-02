@@ -11,12 +11,15 @@ FILEFLAGSMASK 0x3f
 {
     BLOCK "StringFileInfo" {
         BLOCK "000004b0" {
-            VALUE "ProductVersion", "0.1.0"
-            VALUE "FileDescription", "Koalas on Krack"
-            VALUE "FileVersion", "0.1.0"
-            VALUE "OriginalFilename", "reutils.exe"
-            VALUE "LegalCopyright", "Copyright © 2023"
             VALUE "ProductName", "reutils"
+            VALUE "CompanyName", "reutils project"
+            VALUE "PrivateBuild", "Koalas on Krack"
+            VALUE "InternalName", "reutils.exe"
+            VALUE "OriginalFilename", "reutils.exe"
+            VALUE "ProductVersion", "0.1.0"
+            VALUE "FileVersion", "0.1.0"
+            VALUE "LegalCopyright", "Copyright © 2023"
+            VALUE "FileDescription", "reutils binary"
         }
     }
     BLOCK "VarFileInfo" {
