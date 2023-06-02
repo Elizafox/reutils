@@ -97,7 +97,7 @@ Utilities
 - [ ] ps
 - [x] pwd
 - [ ] read
-- [x] renice
+- [x] renice *(Note: no Windows support yet)*
 - [ ] rm
 - [ ] rmdir
 - [ ] sed
