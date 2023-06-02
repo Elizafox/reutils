@@ -10,7 +10,7 @@ use crate::err::{Error, Result};
 #[cfg(unix)]
 fn set_priority(niceness: i32) {
     use errno::{errno, set_errno, Errno};
-    use libc::{c_int, getpriority, setpriority, PRIO_PROCESS};
+    use libc::{getpriority, setpriority, PRIO_PROCESS};
     use std::io;
 
     set_errno(Errno(0));
@@ -24,8 +24,7 @@ fn set_priority(niceness: i32) {
     }
 
     let new_priority = niceness + current_priority;
-    let ret = unsafe { setpriority(PRIO_PROCESS, 0, new_priority as c_int) };
-    if ret < 0 {
+    if unsafe { setpriority(PRIO_PROCESS, 0, new_priority.into()) } < 0 {
         eprintln!(
             "Could not set process priority: {}",
             io::Error::last_os_error()
