@@ -1,5 +1,5 @@
-#define RT_MANIFEST 24
 #pragma code_page(65001)
+#define RT_MANIFEST 24
 1 VERSIONINFO
 FILESUBTYPE 0x0
 FILEFLAGS 0x0
@@ -14,16 +14,16 @@ FILEFLAGSMASK 0x3f
             VALUE "ProductName", "reutils"
             VALUE "CompanyName", "reutils project"
             VALUE "PrivateBuild", "Koalas on Krack"
-            VALUE "InternalName", "reutils.exe"
+            VALUE "InternalName", "reutils"
             VALUE "OriginalFilename", "reutils.exe"
             VALUE "ProductVersion", "0.1.0"
             VALUE "FileVersion", "0.1.0"
-            VALUE "LegalCopyright", "Copyright © 2023"
-            VALUE "FileDescription", "reutils binary"
+            VALUE "LegalCopyright", "Copyright © 2023 Elizabeth Myers and Malina Thomas. All rights reserved. Licensed under the GPLv2 ONLY."
+            VALUE "FileDescription", "A reimplementation of BusyBox in Rust"
         }
     }
     BLOCK "VarFileInfo" {
-        VALUE "Translation", 0x0009, 0x04b0
+        VALUE "Translation", 0x0000, 0x04b0
     }
 }
 1 ICON "assets/icon.ico"
