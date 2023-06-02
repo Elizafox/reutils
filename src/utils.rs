@@ -8,6 +8,7 @@ mod head;
 mod ln_link;
 mod nice;
 mod pwd;
+mod renice;
 mod reutils;
 mod sleep;
 mod tail;
@@ -39,6 +40,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "ln" => ("bin/ln", ln_link::util_ln),
     "nice" => ("usr/bin/nice", nice::util),
     "pwd" => ("bin/pwd", pwd::util),
+    "renice" => ("usr/bin/renice", renice::util),
     "reutils" => ("usr/sbin/reutils", reutils::util),
     "sleep" => ("bin/sleep", sleep::util),
     "tail" => ("usr/bin/tail", tail::util),

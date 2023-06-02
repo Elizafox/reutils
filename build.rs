@@ -6,7 +6,6 @@
 use std::env;
 use std::error::Error;
 
-use embed_resource;
 use gethostname::gethostname;
 
 use vergen::EmitBuilder;

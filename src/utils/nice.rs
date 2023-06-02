@@ -24,7 +24,7 @@ fn set_priority(niceness: i32) {
     }
 
     let new_priority = niceness + current_priority;
-    if unsafe { setpriority(PRIO_PROCESS, 0, new_priority.into()) } < 0 {
+    if unsafe { setpriority(PRIO_PROCESS, 0, new_priority) } < 0 {
         eprintln!(
             "Could not set process priority: {}",
             io::Error::last_os_error()
