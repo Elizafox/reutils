@@ -18,16 +18,23 @@ pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     /* If you're building for a REALLY old Linux, from before kernel 2.4.19:
      * 0) Impressive that you got Rust to build on an antique like that
      * 1) Upgrade
-     * 2) Change this to /etc/mtab
+     * 2) We will fall back to /etc/mtab if this fails.
      *
      * It's been 21 years as of this writing, /proc/self/mounts is old enough to drink. And if your
      * environment doesn't have procfs, your environment sucks and you need to rethink your life
      * choices.
      * --Elizafox
      */
-    let mntfile = unsafe { setmntent(b"/proc/self/mounts\0".as_ptr(), "r\0".as_ptr()) };
+    let mut mntfile = unsafe { setmntent(b"/proc/self/mounts\0".as_ptr(), "r\0".as_ptr()) };
     if mntfile.is_null() {
-        return Err(io::Error::last_os_error());
+        // Sigh.
+        mntfile = unsafe { setmntent(b"/etc/mtab\0".as_ptr(), "r\0".as_ptr()) };
+        if mntfile.is_null() {
+            return Err(io::Error::last_os_error());
+        }
+
+        eprintln!("WARNING: could not open /proc/self/mounts, falling back to /etc/mtab.");
+        eprintln!("Information may not be accurate!");
     }
 
     loop {
