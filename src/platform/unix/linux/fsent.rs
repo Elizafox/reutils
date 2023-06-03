@@ -15,7 +15,17 @@ pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     let mut entries = Vec::<FilesystemEntry>::new();
     let mut result: Option<io::Error> = None;
 
-    let mntfile = unsafe { setmntent(b"/etc/mtab\0".as_ptr(), "r\0".as_ptr()) };
+    /* If you're building for a REALLY old Linux, from before kernel 2.4.19:
+     * 0) Impressive that you got Rust to build on an antique like that
+     * 1) Upgrade
+     * 2) Change this to /etc/mtab
+     *
+     * It's been 21 years as of this writing, /proc/self/mounts is old enough to drink. And if your
+     * environment doesn't have procfs, your environment sucks and you need to rethink your life
+     * choices.
+     * --Elizafox
+     */
+    let mntfile = unsafe { setmntent(b"/proc/self/mounts\0".as_ptr(), "r\0".as_ptr()) };
     if mntfile.is_null() {
         return Err(io::Error::last_os_error());
     }
