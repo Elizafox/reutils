@@ -92,25 +92,3 @@ pub fn get_filesystem_stats(mount_point: &str) -> io::Result<FilesystemStats> {
         blocks_available: fs.f_bavail,
     })
 }
-
-fn main() {
-    let filesystems = match get_mounted_filesystems() {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error: {e}");
-            exit(1);
-        }
-    };
-
-    for fs in filesystems {
-        eprintln!("Filesystem: {}", fs.mount_point);
-        match get_filesystem_stats(&fs.mount_point) {
-            Ok(data) => {
-                dbg!(data);
-            }
-            Err(e) => {
-                eprintln!("Error getting info: {e}");
-            }
-        }
-    }
-}
