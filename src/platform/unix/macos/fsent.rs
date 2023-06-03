@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::ffi::{CStr, CString, c_int, c_void};
+use std::ffi::{c_int, c_void, CStr, CString};
 use std::io;
 use std::mem::MaybeUninit;
 use std::ptr::null_mut;
@@ -12,8 +12,8 @@ use std::slice::from_raw_parts;
 use libc::{
     free, statfs, statvfs, MNT_ASYNC, MNT_AUTOMOUNTED, MNT_CPROTECT, MNT_DEFWRITE, MNT_DONTBROWSE,
     MNT_DOVOLFS, MNT_EXPORTED, MNT_IGNORE_OWNERSHIP, MNT_JOURNALED, MNT_LOCAL, MNT_MULTILABEL,
-    MNT_QUARANTINE, MNT_NODEV, MNT_NOEXEC, MNT_NOSUID, MNT_NOWAIT, MNT_QUOTA, MNT_RDONLY, MNT_ROOTFS,
-    MNT_SYNCHRONOUS, MNT_UNION, MNT_NOUSERXATTR, MNT_NOATIME, MNT_SNAPSHOT,
+    MNT_NOATIME, MNT_NODEV, MNT_NOEXEC, MNT_NOSUID, MNT_NOUSERXATTR, MNT_NOWAIT, MNT_QUARANTINE,
+    MNT_QUOTA, MNT_RDONLY, MNT_ROOTFS, MNT_SNAPSHOT, MNT_SYNCHRONOUS, MNT_UNION,
 };
 
 use crate::platform::fsent::*;

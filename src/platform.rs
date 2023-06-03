@@ -9,5 +9,5 @@ pub mod unix;
 #[cfg(windows)]
 pub mod windows;
 
-pub mod signal;
 pub mod fsent;
+pub mod signal;

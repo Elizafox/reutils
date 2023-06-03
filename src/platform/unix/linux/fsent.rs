@@ -39,18 +39,16 @@ pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
 
         let mnt = unsafe { mnt.assume_init() };
 
-        let filesystem_entry = unsafe {
+        entries.push(unsafe {
             FilesystemEntry {
-                filesystem_name: CStr::from_ptr(mnt.mnt_type)
+                filesystem_name: CStr::from_ptr(mnt.mnt_type).to_string_lossy().into_owned(),
+                mount_point: CStr::from_ptr(mnt.mnt_dir).to_string_lossy().into_owned(),
+                mount_from: CStr::from_ptr(mnt.mnt_fsname)
                     .to_string_lossy()
                     .into_owned(),
-                mount_point: CStr::from_ptr(mnt.mnt_dir).to_string_lossy().into_owned(),
-                mount_from: CStr::from_ptr(mnt.mnt_fsname).to_string_lossy().into_owned(),
                 mount_options: CStr::from_ptr(mnt.mnt_opts).to_string_lossy().into_owned(),
-            };
-        }
-
-        entries.push(filesystem_entry);
+            }
+        });
     }
 
     unsafe {
