@@ -6,6 +6,9 @@
 #[cfg(unix)]
 pub use crate::platform::unix::fsent::*;
 
+#[cfg(windows)]
+pub use crate::platform::windows::fsent::*;
+
 #[derive(Debug)]
 pub struct FilesystemEntry {
     pub filesystem_name: String,
