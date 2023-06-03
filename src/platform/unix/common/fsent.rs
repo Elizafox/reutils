@@ -9,6 +9,7 @@ use std::path::Path;
 
 // Unlike the other routines, this one is fairly simple: We just iterate through the parents until
 // we find that its parent has a different mountpoint; then we've found it.
+#[ignore(clippy::missing_errors_doc)]
 pub fn get_path_mountpoint(path: &str) -> io::Result<String> {
     let mut child = Path::new(path).canonicalize()?;
     let mut child_metadata = child.metadata()?;
