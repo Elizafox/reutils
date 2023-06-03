@@ -1,4 +1,4 @@
-/* platform/unix/signal.rs - Unix signal handling routines for reutils
+/* platform/unix/common/signal.rs - Unix signal handling routines for reutils
  * Copyright (C) 2023 Elizabeth Myers. All rights reserved.
  * SPDX-License-Identifier: GPL-2.0-only
  */
