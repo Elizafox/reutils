@@ -40,29 +40,39 @@ fn display_table(table: Vec<[String; 6]>) {
 }
 
 pub fn util(args: &[String]) -> Result {
-    let mut use_1024_kb_units = false;
-    let mut use_portable_format = false;
+    let mut block_size = 4096u64; // Modern default
 
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
-            Opt::Short('k') => use_1024_kb_units = true,
-            Opt::Short('P') => use_portable_format = true,
+            Opt::Short('b' | 'P') => block_size = 512u64,
+            Opt::Short('k') => block_size = 1024u64,
+            Opt::Short('m') => block_size = 1_048_576_u64,
+            Opt::Short('g') => block_size = 107_374_182_u64,
+            Opt::Short('B') | Opt::Long("block-size") => {
+                opts.value().map_or_else(
+                    |_| eprintln!("Error: No block size specified, ignoring"),
+                    |string| {
+                        string.parse::<u64>().map_or_else(
+                            |_| eprintln!("Error: Invalid block size specified, ignoring"),
+                            |value| {
+                                if value > 0 {
+                                    block_size = value;
+                                } else {
+                                    eprintln!("Error: Block size cannot be zero, ignoring");
+                                }
+                            },
+                        )
+                    },
+                );
+            }
             Opt::Short('h') | Opt::Long("help") => {
-                eprintln!("Usage: {} [-k] [-p] [-t]", args[0]);
+                eprintln!("Usage: {} [-B|--block-size] [-b|-P] [-g] [-k] [-m] [-t]", args[0]);
                 return Ok(());
             }
             _ => {}
         }
     }
-
-    let block_size = if use_1024_kb_units {
-        1024u64 // POSIX sez so
-    } else if use_portable_format {
-        512u64 // Also
-    } else {
-        4096u64 // Modern default
-    };
 
     let mut args = Vec::<String>::new();
     for arg in opts.positionals() {
