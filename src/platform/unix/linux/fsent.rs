@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::io;
 use std::mem::MaybeUninit;
 
-use libc::{endmntent, getmntent_r, mntent, setmntent, PATH_MAX};
+use libc::{statvfs, endmntent, getmntent_r, mntent, setmntent, PATH_MAX};
 
 use crate::platform::fsent::*;
 

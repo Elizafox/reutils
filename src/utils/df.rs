@@ -94,12 +94,14 @@ pub fn util(args: &[String]) -> Result {
         "Mounted on".to_string(),
     ]];
     for (mount_point, mount_from) in filesystems {
-        let stats = get_filesystem_stats(&mount_point).map_err(|e| {
-            Error::new(
-                1,
-                format!("Could not get filesystem info for {mount_point}: {e}"),
-            )
-        })?;
+        let stats;
+        match get_filesystem_stats(&mount_point) {
+            Ok(s) => stats = s,
+            Err(e) => {
+                eprintln!("Could not get filesystem info for {mount_point}: {e}");
+                continue;
+            }
+        }
 
         let (blocks_total, blocks_free) = if block_size == stats.block_size {
             (stats.blocks_total, stats.blocks_free)
