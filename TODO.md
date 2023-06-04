@@ -37,7 +37,7 @@ Utilities
 - [ ] cut
 - [ ] date
 - [ ] dd
-- [x] df
+- [x] df *(Note: Linux, macOS, and FreeBSD only for now)*
 - [ ] diff
 - [x] dirname
 - [ ] du
