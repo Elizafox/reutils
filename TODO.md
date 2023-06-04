@@ -37,7 +37,7 @@ Utilities
 - [ ] cut
 - [ ] date
 - [ ] dd
-- [ ] df
+- [x] df
 - [ ] diff
 - [x] dirname
 - [ ] du
