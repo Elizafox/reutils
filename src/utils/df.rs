@@ -23,7 +23,7 @@ fn display_table(table: Vec<[String; 6]>) {
     // XXX - HACK ALERT!!!
     for row in table {
         println!(
-            "{}{}{}{} {}{} {}{} {}{} {}",
+            "{} {}{}{} {}{} {}{} {}{} {}",
             row[0],
             " ".repeat(col_lengths[0] - row[0].len()),
             " ".repeat(col_lengths[1] - row[1].len()),
