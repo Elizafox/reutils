@@ -48,7 +48,7 @@ pub fn util(args: &[String]) -> Result {
             Opt::Short('b' | 'P') => block_size = 512u64,
             Opt::Short('k') => block_size = 1024u64,
             Opt::Short('m') => block_size = 1_048_576_u64,
-            Opt::Short('g') => block_size = 107_374_182_u64,
+            Opt::Short('g') => block_size = 1_073_741_824_u64,
             Opt::Short('B') | Opt::Long("block-size") => {
                 opts.value().map_or_else(
                     |_| eprintln!("Error: No block size specified, ignoring"),
