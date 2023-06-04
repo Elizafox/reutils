@@ -1,3 +1,9 @@
+Documentation
+-------------
+Manpages should be written. Likely, we will want to generate manpages from something else, as `troff` is an extremely hideous and antiquated format to write anything in.
+
+*(TODO: investigate if we can use docstrings for this purpose?)*
+
 Utilities implemented
 ---------------------
 See [the POSIX list of utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html) for a guideline of what we intend to implement. The [BusyBox list of commands](https://boxmatrix.info/wiki/BusyBox-Commands) is also a general guideline, although many utilities will likely not be implemented due to dubious usefulness.
