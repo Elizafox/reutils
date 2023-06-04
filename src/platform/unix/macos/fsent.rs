@@ -153,8 +153,8 @@ pub fn get_filesystem_stats(mount_point: &str) -> io::Result<FilesystemStats> {
 
     Ok(FilesystemStats {
         block_size: fs.f_bsize.into(),
-        blocks_total: fs.f_blocks.into(),
-        blocks_free: fs.f_bfree.into(),
-        blocks_available: fs.f_bavail.into(),
+        blocks_total: fs.f_blocks,
+        blocks_free: fs.f_bfree,
+        blocks_available: fs.f_bavail,
     })
 }
