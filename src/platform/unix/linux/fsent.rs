@@ -7,9 +7,9 @@ use std::ffi::{CStr, CString};
 use std::io;
 use std::mem::MaybeUninit;
 
-use libc::{statvfs, endmntent, getmntent_r, mntent, setmntent, PATH_MAX};
+use libc::{endmntent, getmntent_r, mntent, setmntent, statvfs, PATH_MAX};
 
-use crate::platform::fsent::*;
+use crate::platform::fsent::{FilesystemEntry, FilesystemStats};
 
 #[allow(clippy::missing_errors_doc)]
 pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
