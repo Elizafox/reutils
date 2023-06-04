@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-pub use crate::platform::unix::fsent::*;
+pub use crate::platform::unix::common::fsent::*;
 
 #[cfg(target_os = "linux")]
 pub use crate::platform::unix::linux::fsent::*;

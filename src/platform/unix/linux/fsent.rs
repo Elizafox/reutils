@@ -11,7 +11,7 @@ use libc::{endmntent, getmntent_r, mntent, setmntent, PATH_MAX};
 
 use crate::platform::fsent::*;
 
-#[ignore(clippy::missing_errors_doc)]
+#[allow(clippy::missing_errors_doc)]
 pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     let mut entries = Vec::<FilesystemEntry>::new();
     let mut result: Option<io::Error> = None;
@@ -76,7 +76,7 @@ pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     result.map_or_else(|| Ok(entries), Err)
 }
 
-#[ignore(clippy::missing_errors_doc)]
+#[allow(clippy::missing_errors_doc)]
 pub fn get_filesystem_stats(mount_point: &str) -> io::Result<FilesystemStats> {
     let mut fs = MaybeUninit::<statvfs>::uninit();
 

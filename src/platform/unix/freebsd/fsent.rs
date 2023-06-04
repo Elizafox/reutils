@@ -119,7 +119,7 @@ fn get_mount_options(fs: &statfs) -> String {
     format!("({})", opts.join(", "))
 }
 
-#[ignore(clippy::missing_errors_doc)]
+#[allow(clippy::missing_errors_doc)]
 pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     let mut result = Vec::<FilesystemEntry>::new();
 
@@ -151,7 +151,7 @@ pub fn get_mounted_filesystems() -> io::Result<Vec<FilesystemEntry>> {
     Ok(result)
 }
 
-#[ignore(clippy::missing_errors_doc)]
+#[allow(clippy::missing_errors_doc)]
 pub fn get_filesystem_stats(mount_point: &str) -> io::Result<FilesystemStats> {
     let mut fs = MaybeUninit::<statvfs>::uninit();
 
