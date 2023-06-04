@@ -6,6 +6,7 @@
 mod basename;
 mod cal;
 mod cat;
+#[cfg(unix)] // Not working on Windows
 mod df;
 mod dirname;
 mod echo;
@@ -14,6 +15,7 @@ mod head;
 mod ln_link;
 mod nice;
 mod pwd;
+#[cfg(unix)] // Not working on Windows
 mod renice;
 mod reutils;
 mod sleep;
@@ -38,6 +40,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "basename" => ("usr/bin/basename", basename::util),
     "cal" => ("usr/bin/cal", cal::util),
     "cat" => ("bin/cat", cat::util),
+    #[cfg(unix)] // Broken on Windows
     "df" => ("bin/df", df::util),
     "dirname" => ("usr/bin/dirname", dirname::util),
     "echo" => ("bin/echo", echo::util),
@@ -47,6 +50,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "ln" => ("bin/ln", ln_link::util_ln),
     "nice" => ("usr/bin/nice", nice::util),
     "pwd" => ("bin/pwd", pwd::util),
+    #[cfg(unix)] // Not working on Windows
     "renice" => ("usr/bin/renice", renice::util),
     "reutils" => ("usr/sbin/reutils", reutils::util),
     "sleep" => ("bin/sleep", sleep::util),
