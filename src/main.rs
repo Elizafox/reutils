@@ -21,7 +21,7 @@ use std::env;
 use std::path::Path;
 use std::process::exit;
 
-use crate::err::Result;
+use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
 
 #[cfg(target_os = "windows")]
@@ -62,7 +62,6 @@ fn do_exit(result: Result) -> ! {
             if e.message.is_some() {
                 eprintln!("{e}");
             }
-
             exit(e.code)
         }
     }
@@ -77,6 +76,5 @@ fn main() {
         do_exit(util_entry.1(args.as_slice()))
     }
 
-    eprintln!("{util}: utility not found");
-    exit(1);
+    do_exit(Err(Error::new(1, format!("{util}: utility not found"))));
 }
