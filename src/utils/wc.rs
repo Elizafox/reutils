@@ -16,6 +16,51 @@ use crate::err::{Error, Result};
 // Good enough for anyone.
 const BUFFSIZE: usize = 16384usize;
 
+// -m, -c, or neither
+#[derive(PartialEq, Eq)]
+pub enum FlagsUnitType {
+    NoneType,
+    Char,
+    Byte,
+}
+
+// Flags
+pub struct Flags {
+    pub chars_bytes: FlagsUnitType,
+    pub words: bool,
+    pub lines: bool,
+}
+
+impl Flags {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            chars_bytes: FlagsUnitType::NoneType,
+            words: false,
+            lines: false,
+        }
+    }
+}
+
+pub struct Stats {
+    pub chars: usize,
+    pub words: usize,
+    pub lines: usize,
+    pub encoding_error: Option<io::Error>,
+}
+
+impl Stats {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            chars: 0usize,
+            words: 0usize,
+            lines: 0usize,
+            encoding_error: None,
+        }
+    }
+}
+
 // Used to keep track of counting state
 pub struct CountStatsState {
     pub in_word: bool,
@@ -29,68 +74,60 @@ impl CountStatsState {
 }
 
 // Get the counts stats for a string, returning what a human "expects".
-fn count_stats_str(string: &str, state: &mut CountStatsState) -> (usize, usize, usize) {
-    let mut lines = 0usize;
-    let mut words = 0usize;
-    let mut chars = 0usize;
+fn count_stats_str(string: &str, tracking_state: &mut CountStatsState) -> Stats {
+    let mut stats = Stats::new();
 
     for c in string.chars() {
-        chars += 1;
+        stats.chars += 1;
 
         if c.is_whitespace() {
             if c == '\n' {
-                lines += 1;
+                stats.lines += 1;
             }
-            if state.in_word {
-                words += 1;
-                state.in_word = false;
+            if tracking_state.in_word {
+                stats.words += 1;
+                tracking_state.in_word = false;
             }
         } else {
-            state.in_word = true;
+            tracking_state.in_word = true;
         }
     }
 
-    (lines, words, chars)
+    stats
 }
 
 // Get the counts stats for a bunch of bytes
-fn count_stats_bytes(bytes: &[u8], state: &mut CountStatsState) -> (usize, usize, usize) {
+fn count_stats_bytes(bytes: &[u8], tracking_state: &mut CountStatsState) -> Stats {
     // ASCII whitespace chars
     const WHITESPACE: [u8; 6] = *b"\x09\x0A\x0B\x0C\x0D\x20";
 
-    let mut lines = 0usize;
-    let mut words = 0usize;
-    let chars = bytes.len();
+    let mut stats = Stats::new();
+    stats.chars = bytes.len();
 
     for b in bytes {
         if WHITESPACE.contains(b) {
             if *b == b'\n' {
-                lines += 1;
+                stats.lines += 1;
             }
-            if state.in_word {
-                words += 1;
-                state.in_word = false;
+            if tracking_state.in_word {
+                stats.words += 1;
+                tracking_state.in_word = false;
             }
         } else {
-            state.in_word = true;
+            tracking_state.in_word = true;
         }
     }
 
-    (lines, words, chars)
+    stats
 }
 
-// Returns (lines, words, chars, encoding_errors) or Err.
-// XXX - really should do better for encoding errors
-fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize, usize, bool)> {
-    let mut lines = 0usize;
-    let mut words = 0usize;
-    let mut chars = 0usize;
+fn read_file(reader: &mut BufInput, flags: &Flags) -> io::Result<Stats> {
+    let mut stats = Stats::new();
 
     let mut buffer = [0u8; BUFFSIZE];
-    let mut state = CountStatsState::new();
+    let mut tracking_state = CountStatsState::new();
     let mut start = 0usize;
     let mut has_eof = false;
-    let mut has_encoding_errors = false;
     while !has_eof || start > 0 {
         let len = if !has_eof && start < buffer.len() {
             // Ingest more data
@@ -104,8 +141,8 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
                     start
                 } else {
                     // If we were still in a word, then count the last one.
-                    if state.in_word {
-                        words += 1;
+                    if tracking_state.in_word {
+                        stats.words += 1;
                     }
 
                     continue;
@@ -119,67 +156,59 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
             start
         };
 
-        if do_chars {
+        let this_stats = if flags.chars_bytes == FlagsUnitType::Char {
             // Unicode
             let str_data;
             match std::str::from_utf8(&buffer[..len]) {
                 Ok(data) => {
+                    // Valid string, good to go
                     str_data = data.to_string();
                     start = 0;
                 }
                 Err(e) => {
+                    // Hmm, seems we have a problem.
                     let valid_up_to = e.valid_up_to();
                     str_data = unsafe { std::str::from_utf8_unchecked(&buffer[..valid_up_to]) }
                         .to_string();
 
                     if let Some(invalid_bytes) = e.error_len() {
                         // Skip the bad bits.
-                        has_encoding_errors = true;
+                        stats.encoding_error = Some(io::Error::from(io::ErrorKind::InvalidData));
                         let skip = invalid_bytes + valid_up_to;
                         buffer.copy_within(skip..len, 0);
                         start = len - skip;
                     } else {
+                        // This is part of another char, just put it at the beginning.
                         buffer.copy_within(valid_up_to..len, 0);
                         start = len - valid_up_to;
                     }
                 }
             }
 
-            let (c_lines, c_words, c_chars) = count_stats_str(&str_data, &mut state);
-            lines += c_lines;
-            words += c_words;
-            chars += c_chars;
+            count_stats_str(&str_data, &mut tracking_state)
         } else {
-            // Raw bytes
-            let (c_lines, c_words, c_chars) = count_stats_bytes(&buffer[..len], &mut state);
-            lines += c_lines;
-            words += c_words;
-            chars += c_chars;
-        }
+            count_stats_bytes(&buffer[..len], &mut tracking_state)
+        };
+
+        stats.lines += this_stats.lines;
+        stats.words += this_stats.words;
+        stats.chars += this_stats.chars;
     }
 
-    Ok((lines, words, chars, has_encoding_errors))
+    Ok(stats)
 }
 
-fn print_stats(
-    do_lines: bool,
-    do_words: bool,
-    do_bytes_chars: bool,
-    lines: usize,
-    words: usize,
-    chars: usize,
-    filename: &str,
-) {
-    if do_lines {
-        print!(" {lines}");
+fn print_stats(flags: &Flags, stats: &Stats, filename: &str) {
+    if flags.lines {
+        print!(" {}", stats.lines);
     }
 
-    if do_words {
-        print!(" {words}");
+    if flags.words {
+        print!(" {}", stats.words);
     }
 
-    if do_bytes_chars {
-        print!(" {chars}");
+    if flags.chars_bytes != FlagsUnitType::NoneType {
+        print!(" {}", stats.chars);
     }
 
     if filename.is_empty() {
@@ -190,25 +219,21 @@ fn print_stats(
 }
 
 // XXX - bool param for signalling encoding errors is bogus
-// XXX - also need a proper flags structure
-#[allow(clippy::fn_params_excessive_bools)]
-fn handle_file(
-    reader: &mut BufInput,
-    do_lines: bool,
-    do_words: bool,
-    do_chars: bool,
-    do_bytes: bool,
-) -> io::Result<(usize, usize, usize, bool)> {
-    if do_bytes && !do_lines && !do_words && reader.is_file() {
+fn handle_file(reader: &mut BufInput, flags: &Flags) -> io::Result<Stats> {
+    let mut stats: Stats;
+    #[allow(clippy::cast_possible_truncation)]
+    if flags.chars_bytes == FlagsUnitType::Byte && !flags.lines && !flags.words && reader.is_file()
+    {
         // If we just have -c, and it's a normal reader, we can just stat the reader and go home.
         let BufInput::File(f) = reader else { unreachable!() };
         let metadata = f.get_ref().metadata()?;
-        #[allow(clippy::cast_possible_truncation)]
-        return Ok((0, 0, metadata.len() as usize, false));
+        stats = Stats::new();
+        stats.chars = metadata.len() as usize;
+        return Ok(stats);
     }
 
-    let result = read_file(reader, do_chars)?;
-    Ok(result)
+    stats = read_file(reader, flags)?;
+    Ok(stats)
 }
 
 fn usage(arg0: &str) {
@@ -216,34 +241,27 @@ fn usage(arg0: &str) {
 }
 
 pub fn util(args: &[String]) -> Result {
-    // We have a separate default flag.
     let mut do_default = true;
-    // XXX this should all go in a struct
-    let mut do_bytes = false; // XXX this should be an enum
-    let mut do_chars = false; // XXX
-    let mut do_lines = false;
-    let mut do_words = false;
+    let mut flags = Flags::new();
 
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
             Opt::Short('c') => {
                 do_default = false;
-                do_bytes = true;
-                do_chars = false;
+                flags.chars_bytes = FlagsUnitType::Byte;
             }
             Opt::Short('m') => {
                 do_default = false;
-                do_bytes = false;
-                do_chars = true;
+                flags.chars_bytes = FlagsUnitType::Char;
             }
             Opt::Short('l') => {
                 do_default = false;
-                do_lines = true;
+                flags.lines = true;
             }
             Opt::Short('w') => {
                 do_default = false;
-                do_words = true;
+                flags.words = true;
             }
             Opt::Short('h') | Opt::Long("help") => {
                 usage(&args[0]);
@@ -255,9 +273,9 @@ pub fn util(args: &[String]) -> Result {
 
     if do_default {
         // Default options
-        do_bytes = true;
-        do_lines = true;
-        do_words = true;
+        flags.chars_bytes = FlagsUnitType::Byte;
+        flags.lines = true;
+        flags.words = true;
     }
 
     let mut files: Vec<(&str, BufInput)> = Vec::new();
@@ -288,45 +306,27 @@ pub fn util(args: &[String]) -> Result {
 
     let file_count = files.len();
 
-    let mut lines = 0usize;
-    let mut words = 0usize;
-    let mut chars = 0usize;
+    let mut stats = Stats::new();
     for (filename, ref mut file) in &mut files {
-        let result = handle_file(file, do_lines, do_words, do_chars, do_bytes);
+        let result = handle_file(file, &flags);
         match result {
-            Ok((this_lines, this_words, this_chars, has_encoding_errors)) => {
-                if has_encoding_errors {
-                    eprintln!("{}: {filename}: Illegal byte sequence", args[0]);
+            Ok(stats_result) => {
+                if let Some(ref encoding_error) = stats.encoding_error {
+                    eprintln!("{}: {filename}: {encoding_error}", args[0]);
                 }
 
-                print_stats(
-                    do_lines,
-                    do_words,
-                    do_bytes || do_chars,
-                    this_lines,
-                    this_words,
-                    this_chars,
-                    filename,
-                );
+                print_stats(&flags, &stats_result, filename);
 
-                lines += this_lines;
-                words += this_words;
-                chars += this_chars;
+                stats.lines += stats_result.lines;
+                stats.words += stats_result.words;
+                stats.chars += stats_result.chars;
             }
             Err(e) => eprintln!("{}: Error reading file {filename}: {e}", args[0]),
         }
     }
 
     if file_count > 1usize {
-        print_stats(
-            do_lines,
-            do_words,
-            do_bytes || do_chars,
-            lines,
-            words,
-            chars,
-            "total",
-        );
+        print_stats(&flags, &stats, "total");
     }
 
     Ok(())
