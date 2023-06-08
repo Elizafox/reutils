@@ -67,7 +67,10 @@ pub fn util(args: &[String]) -> Result {
                 );
             }
             Opt::Short('h') | Opt::Long("help") => {
-                eprintln!("Usage: {} [-B|--block-size] [-b|-P] [-g] [-k] [-m] [-t]", args[0]);
+                eprintln!(
+                    "Usage: {} [-B|--block-size] [-b|-P] [-g] [-k] [-m] [-t]",
+                    args[0]
+                );
                 return Ok(());
             }
             _ => {}

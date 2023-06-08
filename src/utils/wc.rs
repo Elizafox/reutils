@@ -4,8 +4,8 @@
  */
 
 use std::fs::File;
-use std::io::prelude::*;
 use std::io;
+use std::io::prelude::*;
 
 use getargs::{Opt, Options};
 
@@ -89,11 +89,7 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
     let mut state = CountStatsState::new();
     let mut start = 0usize;
     let mut has_eof = false;
-    loop {
-        if has_eof && start == 0 {
-            break;
-        }
-
+    while !has_eof || start > 0 {
         let len = if !has_eof && start < buffer.len() {
             // Ingest more data
             match reader.read(&mut buffer[start..]) {
@@ -188,24 +184,24 @@ pub fn util(args: &[String]) -> Result {
                 do_default = false;
                 do_bytes = true;
                 do_chars = false;
-            },
+            }
             Opt::Short('m') => {
                 do_default = false;
                 do_bytes = false;
                 do_chars = true;
-            },
+            }
             Opt::Short('l') => {
                 do_default = false;
                 do_lines = true;
-            },
+            }
             Opt::Short('w') => {
                 do_default = false;
                 do_words = true;
-            },
+            }
             Opt::Short('h') | Opt::Long("help") => {
                 usage(&args[0]);
                 return Ok(());
-            },
+            }
             _ => {}
         }
     }
@@ -269,14 +265,14 @@ pub fn util(args: &[String]) -> Result {
                     this_lines += lines;
                     this_words += words;
                     this_chars += chars;
-                },
+                }
                 Err(e) => {
                     eprintln!("Could not read from {filename}: {e}");
                     continue;
                 }
             }
         }
-        
+
         if do_lines {
             print!(" {this_lines}");
         }
