@@ -30,3 +30,14 @@ impl io::Write for BufOutput<'_> {
         }
     }
 }
+
+impl BufOutput<'_> {
+    #[allow(dead_code)]
+    pub const fn is_file(&self) -> bool {
+        match self {
+            BufOutput::Standard(_) => false,
+            BufOutput::Buffer(_) => true,
+            BufOutput::File(_) => true,
+        }
+    }
+}

@@ -143,7 +143,7 @@ Utilities
 - [ ] val
 - [ ] vi
 - [ ] wait
-- [ ] wc
+- [x] wc
 - [ ] who
 - [ ] write
 - [ ] xargs

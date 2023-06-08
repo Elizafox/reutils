@@ -24,6 +24,7 @@ mod tee;
 mod true_;
 mod tty;
 mod uname;
+mod wc;
 
 use crate::err::Result;
 
@@ -59,6 +60,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "true" => ("bin/true", true_::util),
     "tty" => ("usr/bin/tty", tty::util),
     "uname" => ("usr/bin/uname", uname::util),
+    "wc" => ("usr/bin/wc", wc::util),
 };
 
 pub fn paths() -> Vec<(&'static str, &'static str)> {

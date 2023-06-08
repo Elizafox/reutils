@@ -35,3 +35,12 @@ impl io::BufRead for BufInput<'_> {
         }
     }
 }
+
+impl BufInput<'_> {
+    pub const fn is_file(&self) -> bool {
+        match self {
+            BufInput::Standard(_) => false,
+            BufInput::File(_) => true,
+        }
+    }
+}
