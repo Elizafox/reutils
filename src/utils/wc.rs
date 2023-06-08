@@ -88,20 +88,35 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
     let mut buffer = [0u8; BUFFSIZE];
     let mut state = CountStatsState::new();
     let mut start = 0usize;
+    let mut has_eof = false;
     loop {
-        let len = if start < buffer.len() {
+        if has_eof && start == 0 {
+            break;
+        }
+
+        let len = if !has_eof && start < buffer.len() {
             // Ingest more data
             match reader.read(&mut buffer[start..]) {
-                Ok(l) => {
-                    if l == 0 {
-                        // If we were still in a word, then count the last one.
-                        if state.in_word {
-                            words += 1;
+                Ok(rlen) => {
+                    if rlen == 0 {
+                        has_eof = true;
+
+                        if start > 0 {
+                            // We still have characters in the buffer.
+                            // We should parse them.
+                            start
+                        } else {
+                            // If we were still in a word, then count the last one.
+                            if state.in_word {
+                                words += 1;
+                            }
+
+                            continue;
                         }
-                        // EOF
-                        break;
+                    } else {
+                        // Not EOF, combine starting position and length
+                        rlen + start
                     }
-                    l + start
                 }
                 Err(e) => {
                     // Whoopsie
@@ -110,7 +125,7 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
             }
         } else {
             // Process the string, do not ingest more data.
-            buffer.len()
+            start
         };
 
         if do_chars {
@@ -263,18 +278,18 @@ pub fn util(args: &[String]) -> Result {
         }
         
         if do_lines {
-            print!("\t{this_lines}");
+            print!(" {this_lines}");
         }
 
         if do_words {
-            print!("\t{this_words}");
+            print!(" {this_words}");
         }
 
         if do_bytes || do_chars {
-            print!("\t{this_chars}");
+            print!(" {this_chars}");
         }
 
-        println!("\t{filename}");
+        println!(" {filename}");
 
         lines += this_lines;
         words += this_words;
@@ -283,18 +298,18 @@ pub fn util(args: &[String]) -> Result {
 
     if file_count > 1usize {
         if do_lines {
-            print!("\t{lines}");
+            print!(" {lines}");
         }
 
         if do_words {
-            print!("\t{words}");
+            print!(" {words}");
         }
 
         if do_bytes || do_chars {
-            print!("\t{chars}");
+            print!(" {chars}");
         }
 
-        println!("\tTotal");
+        println!(" total");
     }
 
     Ok(())
