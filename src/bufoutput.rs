@@ -36,8 +36,7 @@ impl BufOutput<'_> {
     pub const fn is_file(&self) -> bool {
         match self {
             BufOutput::Standard(_) => false,
-            BufOutput::Buffer(_) => true,
-            BufOutput::File(_) => true,
+            BufOutput::Buffer(_) | BufOutput::File(_) => true,
         }
     }
 }

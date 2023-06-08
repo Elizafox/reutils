@@ -62,7 +62,7 @@ pub fn util(args: &[String]) -> Result {
                                     eprintln!("Error: Block size cannot be zero, ignoring");
                                 }
                             },
-                        )
+                        );
                     },
                 );
             }

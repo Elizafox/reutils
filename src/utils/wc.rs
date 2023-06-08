@@ -79,8 +79,9 @@ fn count_stats_bytes(bytes: &[u8], state: &mut CountStatsState) -> (usize, usize
     (lines, words, chars)
 }
 
-// Returns (lines, words, chars) or Err.
-fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize, usize)> {
+// Returns (lines, words, chars, encoding_errors) or Err.
+// XXX - really should do better for encoding errors
+fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize, usize, bool)> {
     let mut lines = 0usize;
     let mut words = 0usize;
     let mut chars = 0usize;
@@ -89,35 +90,29 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
     let mut state = CountStatsState::new();
     let mut start = 0usize;
     let mut has_eof = false;
+    let mut has_encoding_errors = false;
     while !has_eof || start > 0 {
         let len = if !has_eof && start < buffer.len() {
             // Ingest more data
-            match reader.read(&mut buffer[start..]) {
-                Ok(rlen) => {
-                    if rlen == 0 {
-                        has_eof = true;
+            let rlen = reader.read(&mut buffer[start..])?;
+            if rlen == 0 {
+                has_eof = true;
 
-                        if start > 0 {
-                            // We still have characters in the buffer.
-                            // We should parse them.
-                            start
-                        } else {
-                            // If we were still in a word, then count the last one.
-                            if state.in_word {
-                                words += 1;
-                            }
-
-                            continue;
-                        }
-                    } else {
-                        // Not EOF, combine starting position and length
-                        rlen + start
+                if start > 0 {
+                    // We still have characters in the buffer.
+                    // We should parse them.
+                    start
+                } else {
+                    // If we were still in a word, then count the last one.
+                    if state.in_word {
+                        words += 1;
                     }
+
+                    continue;
                 }
-                Err(e) => {
-                    // Whoopsie
-                    return Err(e);
-                }
+            } else {
+                // Not EOF, combine starting position and length
+                rlen + start
             }
         } else {
             // Process the string, do not ingest more data.
@@ -139,6 +134,7 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
 
                     if let Some(invalid_bytes) = e.error_len() {
                         // Skip the bad bits.
+                        has_encoding_errors = true;
                         let skip = invalid_bytes + valid_up_to;
                         buffer.copy_within(skip..len, 0);
                         start = len - skip;
@@ -162,7 +158,57 @@ fn read_file(reader: &mut BufInput, do_chars: bool) -> io::Result<(usize, usize,
         }
     }
 
-    Ok((lines, words, chars))
+    Ok((lines, words, chars, has_encoding_errors))
+}
+
+fn print_stats(
+    do_lines: bool,
+    do_words: bool,
+    do_bytes_chars: bool,
+    lines: usize,
+    words: usize,
+    chars: usize,
+    filename: &str,
+) {
+    if do_lines {
+        print!(" {lines}");
+    }
+
+    if do_words {
+        print!(" {words}");
+    }
+
+    if do_bytes_chars {
+        print!(" {chars}");
+    }
+
+    if filename.is_empty() {
+        println!();
+    } else {
+        println!(" {filename}");
+    }
+}
+
+// XXX - bool param for signalling encoding errors is bogus
+// XXX - also need a proper flags structure
+#[allow(clippy::fn_params_excessive_bools)]
+fn handle_file(
+    reader: &mut BufInput,
+    do_lines: bool,
+    do_words: bool,
+    do_chars: bool,
+    do_bytes: bool,
+) -> io::Result<(usize, usize, usize, bool)> {
+    if do_bytes && !do_lines && !do_words && reader.is_file() {
+        // If we just have -c, and it's a normal reader, we can just stat the reader and go home.
+        let BufInput::File(f) = reader else { unreachable!() };
+        let metadata = f.get_ref().metadata()?;
+        #[allow(clippy::cast_possible_truncation)]
+        return Ok((0, 0, metadata.len() as usize, false));
+    }
+
+    let result = read_file(reader, do_chars)?;
+    Ok(result)
 }
 
 fn usage(arg0: &str) {
@@ -172,6 +218,7 @@ fn usage(arg0: &str) {
 pub fn util(args: &[String]) -> Result {
     // We have a separate default flag.
     let mut do_default = true;
+    // XXX this should all go in a struct
     let mut do_bytes = false; // XXX this should be an enum
     let mut do_chars = false; // XXX
     let mut do_lines = false;
@@ -245,67 +292,41 @@ pub fn util(args: &[String]) -> Result {
     let mut words = 0usize;
     let mut chars = 0usize;
     for (filename, ref mut file) in &mut files {
-        let mut this_lines = 0usize;
-        let mut this_words = 0usize;
-        let mut this_chars = 0usize;
-
-        if do_bytes && !do_lines && !do_words && file.is_file() {
-            // If we just have -c, and it's a normal file, we can just stat the file and go home.
-            let BufInput::File(f) = file else { unreachable!() };
-            match f.get_ref().metadata() {
-                Ok(data) => this_chars += data.len() as usize,
-                Err(e) => {
-                    eprintln!("Could not get file {filename} size: {e}");
-                    continue;
+        let result = handle_file(file, do_lines, do_words, do_chars, do_bytes);
+        match result {
+            Ok((this_lines, this_words, this_chars, has_encoding_errors)) => {
+                if has_encoding_errors {
+                    eprintln!("{}: {filename}: Illegal byte sequence", args[0]);
                 }
+
+                print_stats(
+                    do_lines,
+                    do_words,
+                    do_bytes || do_chars,
+                    this_lines,
+                    this_words,
+                    this_chars,
+                    filename,
+                );
+
+                lines += this_lines;
+                words += this_words;
+                chars += this_chars;
             }
-        } else {
-            match read_file(file, do_chars) {
-                Ok((lines, words, chars)) => {
-                    this_lines += lines;
-                    this_words += words;
-                    this_chars += chars;
-                }
-                Err(e) => {
-                    eprintln!("Could not read from {filename}: {e}");
-                    continue;
-                }
-            }
+            Err(e) => eprintln!("{}: Error reading file {filename}: {e}", args[0]),
         }
-
-        if do_lines {
-            print!(" {this_lines}");
-        }
-
-        if do_words {
-            print!(" {this_words}");
-        }
-
-        if do_bytes || do_chars {
-            print!(" {this_chars}");
-        }
-
-        println!(" {filename}");
-
-        lines += this_lines;
-        words += this_words;
-        chars += this_chars;
     }
 
     if file_count > 1usize {
-        if do_lines {
-            print!(" {lines}");
-        }
-
-        if do_words {
-            print!(" {words}");
-        }
-
-        if do_bytes || do_chars {
-            print!(" {chars}");
-        }
-
-        println!(" total");
+        print_stats(
+            do_lines,
+            do_words,
+            do_bytes || do_chars,
+            lines,
+            words,
+            chars,
+            "total",
+        );
     }
 
     Ok(())
