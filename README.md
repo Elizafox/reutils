@@ -25,6 +25,7 @@ Tier 2:
 
 Tier 3:
 - Windows
+- Android
 - Any other Unix workalike
 
 Note that although we try to polyfill for Windows where appropriate, the mapping is not 1 to 1. Not every utility works, as Windows often does not have the needed functionality. In addition, some utilities need elevated privileges to run (notably, `ln`). Of course, you can always use WSL, and it should work.
