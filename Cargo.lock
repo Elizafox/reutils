@@ -485,10 +485,17 @@ dependencies = [
  "mio",
  "notify",
  "phf",
+ "reverse-lines",
  "symlink",
  "vergen",
  "windows",
 ]
+
+[[package]]
+name = "reverse-lines"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6363d23642e19b8737972b698e7d47e63007d93ee1e11ad622fe7b62ea278890"
 
 [[package]]
 name = "rustc_version"

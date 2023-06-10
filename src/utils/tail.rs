@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-/* TODO: a more efficient implementation reading backwards from the file is in order.
- * But this is fine to get something out the door for now.
- */
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -17,6 +14,7 @@ use std::time::Duration;
 use getargs::{Opt, Options};
 use notify::event::EventKind::Modify;
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher, WatcherKind};
+use reverse_lines::ReverseLines;
 
 use crate::bufinput::BufInput;
 use crate::err::{Error, Result};
@@ -110,10 +108,25 @@ fn add_line(buff: &mut VecDeque<String>, line: Result<String, io::Error>, total:
 fn output((file, total): (BufInput, usize)) -> Result {
     let mut buff = VecDeque::with_capacity(total);
 
-    file.lines()
-        .map(|l| add_line(&mut buff, l, total))
-        .collect::<Result<Vec<_>, Error>>()
-        .map(|_| ())?;
+    if let BufInput::File(file) = file {
+        // Use the efficient way
+        let reverse_lines = ReverseLines::new(file)
+            .map_err(|e| Error::new(1, format!("Failed to get reverse iterator: {e}")))?;
+
+        reverse_lines
+            .take(total)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .rev()
+            .map(|l| add_line(&mut buff, l, total))
+            .collect::<Result<Vec<_>, Error>>()
+            .map(|_| ())?;
+    } else {
+        file.lines()
+            .map(|l| add_line(&mut buff, l, total))
+            .collect::<Result<Vec<_>, Error>>()
+            .map(|_| ())?;
+    }
 
     for line in buff {
         println!("{line}");

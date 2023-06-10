@@ -36,6 +36,7 @@ chrono = { version = "0.4.26", default-features = false, features = ["std", "clo
 getargs = "0.5.0"
 notify = { version = "6.0.0", default-features = false, features = ["macos_kqueue"] }
 phf = { version = "0.11.1", features = ["macros"] }
+reverse-lines = "0.1.1"
 
 # 2023-05-28 AMR TODO: remove these when upstreams bump windows-sys
 filetime = "=0.2.20"
