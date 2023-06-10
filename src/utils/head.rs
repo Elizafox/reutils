@@ -22,10 +22,17 @@ pub fn util(args: &[String]) -> Result {
     let mut opts = Options::new(args.iter().skip(1).map(String::as_str));
     while let Some(opt) = opts.next_opt().expect("argument parsing error") {
         match opt {
-            Opt::Short('n') => match u64::from_str(opts.value().unwrap()) {
-                Ok(result) => total = result,
-                Err(e) => {
-                    return Err(Error::new(1, format!("Invalid total: {e}")));
+            Opt::Short('n') => {
+                let arg = match opts.value() {
+                    Ok(result) => result,
+                    Err(_) => return Err(Error::new(1, "-n must have a total".to_string())),
+                };
+
+                match u64::from_str(arg) {
+                    Ok(result) => total = result,
+                    Err(e) => {
+                        return Err(Error::new(1, format!("Invalid total: {e}")));
+                    }
                 }
             },
             Opt::Short('h') | Opt::Long("help") => {
