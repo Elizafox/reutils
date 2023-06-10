@@ -98,14 +98,12 @@ fn count_stats_str(string: &str, tracking_state: &mut CountStatsState) -> Stats 
 
 // Get the counts stats for a bunch of bytes
 fn count_stats_bytes(bytes: &[u8], tracking_state: &mut CountStatsState) -> Stats {
-    // ASCII whitespace chars
-    const WHITESPACE: [u8; 6] = *b"\x09\x0A\x0B\x0C\x0D\x20";
-
     let mut stats = Stats::new();
     stats.chars = bytes.len();
 
     for b in bytes {
-        if WHITESPACE.contains(b) {
+        // Whitespace
+        if (*b >= b'\x09' && *b <= b'\x0D') || *b == b'\x20' {
             if *b == b'\n' {
                 stats.lines += 1;
             }
