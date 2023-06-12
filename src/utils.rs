@@ -19,6 +19,7 @@ mod pwd;
 mod renice;
 mod reutils;
 mod sleep;
+mod strings;
 mod tail;
 mod tee;
 mod true_;
@@ -55,6 +56,7 @@ pub const DISPATCH_TABLE: OrderedMap<&'static str, MapValue> = phf_ordered_map! 
     "renice" => ("usr/bin/renice", renice::util),
     "reutils" => ("usr/sbin/reutils", reutils::util),
     "sleep" => ("bin/sleep", sleep::util),
+    "strings" => ("usr/bin/strings", strings::util),
     "tail" => ("usr/bin/tail", tail::util),
     "tee" => ("usr/bin/tee", tee::util),
     "true" => ("bin/true", true_::util),

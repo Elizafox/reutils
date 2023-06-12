@@ -114,7 +114,7 @@ Utilities
 - [x] sleep
 - [ ] sort
 - [ ] split
-- [ ] strings
+- [x] strings
 - [ ] stty
 - [x] tail
 - [ ] talk
