@@ -95,12 +95,18 @@ fn read_file(reader: &mut BufInput, flags: &Flags) -> io::Result<()> {
             }
         }
 
-        let str_data = str_data
-            .chars()
-            .filter(|&c| !(c.is_control() || c.is_whitespace() && c != ' '))
-            .collect::<String>();
-        if str_data.len() as u64 > flags.min_len {
-            println!("{str_data}");
+        if (str_data.len() as u64) < flags.min_len {
+            // Insufficient data to even bother with the below.
+            continue;
+        }
+
+        for string in str_data.split_whitespace() {
+            let string = string
+                .escape_default()
+                .collect::<String>();
+            if (string.len() as u64) > flags.min_len {
+                println!("{str_data}");
+            }
         }
     }
 
