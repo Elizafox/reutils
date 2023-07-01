@@ -23,6 +23,7 @@ use std::process::exit;
 
 use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
+use crate::platform::allow_sigpipe;
 
 #[cfg(target_os = "windows")]
 fn get_util_name(arg0: &str) -> String {
@@ -68,6 +69,9 @@ fn do_exit(result: Result) -> ! {
 }
 
 fn main() {
+    // Rust blocks SIGPIPE by default, we have to restore it.
+    allow_sigpipe();
+
     let args: Vec<_> = env::args().collect();
     let util = get_util_name(&args[0]);
 
