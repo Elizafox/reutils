@@ -35,12 +35,8 @@ vergen = { version = "8.2.1", features = ["build", "cargo", "git", "git2", "rust
 chrono = { version = "0.4.26", default-features = false, features = ["std", "clock"] }
 getargs = "0.5.0"
 notify = { version = "6.0.0", default-features = false, features = ["macos_kqueue"] }
-phf = { version = "0.11.1", features = ["macros"] }
+phf = { version = "0.11.2", features = ["macros"] }
 reverse-lines = "0.1.1"
-
-# 2023-05-28 AMR TODO: remove these when upstreams bump windows-sys
-filetime = "=0.2.20"
-mio = "=0.8.6"
 
 # Windows-only deps go here
 [target.'cfg(windows)'.dependencies]
@@ -64,4 +60,4 @@ symlink = "0.1.0"
 # Unix-only deps go here
 [target.'cfg(unix)'.dependencies]
 errno = "0.3.1"
-libc = { version = "0.2.144", features = ["const-extern-fn"] }
+libc = { version = "0.2.147", features = ["const-extern-fn"] }
