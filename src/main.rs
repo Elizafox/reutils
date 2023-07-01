@@ -23,7 +23,7 @@ use std::process::exit;
 
 use crate::err::{Error, Result};
 use crate::utils::DISPATCH_TABLE;
-use crate::platform::allow_sigpipe;
+use crate::platform::signal::allow_sigpipe;
 
 #[cfg(target_os = "windows")]
 fn get_util_name(arg0: &str) -> String {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
-use libc::{signal, SIGALRM, SIG_DFL, SIG_IGN};
+use libc::{signal, SIGALRM, SIGPIPE, SIG_DFL, SIG_IGN};
 
 pub fn block_ctrlc() {
     unsafe {
